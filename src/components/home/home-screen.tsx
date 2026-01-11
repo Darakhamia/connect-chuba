@@ -2,10 +2,7 @@
 
 import { useState } from "react";
 import { Profile } from "@prisma/client";
-import { UserButton } from "@clerk/nextjs";
-import { Plus, Users, MessageCircle, Settings, Sparkles } from "lucide-react";
-import { useModal } from "@/hooks/use-modal-store";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Plus, Users, MessageCircle, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FriendsList } from "@/components/friends/friends-list";
 import { cn } from "@/lib/utils";
@@ -18,40 +15,11 @@ interface HomeScreenProps {
 type Tab = "friends" | "messages";
 
 export function HomeScreen({ profile, hasServers }: HomeScreenProps) {
-  const { onOpen } = useModal();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>("friends");
 
   return (
     <div className="h-full flex">
-      {/* Левая панель навигации */}
-      <div className="w-[72px] h-full bg-[#1e1f22] flex flex-col items-center py-3">
-        {/* Логотип ECHO */}
-        <button
-          onClick={() => router.push("/")}
-          className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mb-2 hover:rounded-xl transition-all duration-200"
-        >
-          <Sparkles className="w-6 h-6 text-white" />
-        </button>
-        
-        <div className="w-8 h-[2px] bg-zinc-700 rounded-full my-2" />
-        
-        {/* Добавить сервер */}
-        <button
-          onClick={() => onOpen("createServer")}
-          className="w-12 h-12 rounded-3xl bg-[#313338] hover:bg-emerald-500 hover:rounded-xl flex items-center justify-center transition-all duration-200 group"
-        >
-          <Plus className="w-6 h-6 text-emerald-500 group-hover:text-white transition-colors" />
-        </button>
-        
-        <div className="flex-1" />
-        
-        <div className="flex flex-col items-center gap-2 mb-2">
-          <ThemeToggle />
-          <UserButton afterSignOutUrl="/" />
-        </div>
-      </div>
-
       {/* DM Sidebar */}
       <div className="w-60 h-full bg-[#2b2d31] flex flex-col">
         {/* Search */}

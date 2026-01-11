@@ -1,13 +1,14 @@
 "use client";
 
 import { useVoice } from "@/hooks/use-voice-store";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Mic, Video, PhoneOff, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function VoiceStatusBar() {
   const router = useRouter();
+  const pathname = usePathname();
   const { 
     activeChannelId, 
     activeChannelName, 
@@ -17,7 +18,10 @@ export function VoiceStatusBar() {
     leaveVoice 
   } = useVoice();
 
-  if (!activeChannelId) return null;
+  // Скрываем бар если мы на странице текущего голосового канала
+  const isOnVoiceChannelPage = pathname === `/servers/${activeServerId}/channels/${activeChannelId}`;
+
+  if (!activeChannelId || isOnVoiceChannelPage) return null;
 
   const handleGoToChannel = () => {
     router.push(`/servers/${activeServerId}/channels/${activeChannelId}`);

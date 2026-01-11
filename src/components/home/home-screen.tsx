@@ -107,7 +107,10 @@ export function HomeScreen({ profile, hasServers }: HomeScreenProps) {
                 <p className="text-sm text-zinc-400">Ваше собственное пространство</p>
               </div>
               
-              <div className="p-4 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition cursor-pointer">
+              <div 
+                className="p-4 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition cursor-pointer"
+                onClick={() => router.push("/settings")}
+              >
                 <Settings className="w-8 h-8 text-zinc-400 mx-auto mb-2" />
                 <h3 className="font-semibold text-white">Настройки</h3>
                 <p className="text-sm text-zinc-400">Персонализация ECHO</p>

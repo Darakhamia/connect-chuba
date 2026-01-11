@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { NavigationAction } from "./navigation-action";
 import { NavigationItem } from "./navigation-item";
+import { NavigationHome } from "./navigation-home";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export async function NavigationSidebar() {
@@ -28,10 +29,13 @@ export async function NavigationSidebar() {
 
   return (
     <div className="flex flex-col items-center h-full w-full bg-server-sidebar py-3 space-y-4">
-      {/* Кнопка добавления сервера */}
-      <NavigationAction />
+      {/* Кнопка Домой / Друзья */}
+      <NavigationHome />
       
       <Separator className="h-[2px] w-10 bg-border rounded-full mx-auto" />
+      
+      {/* Кнопка добавления сервера */}
+      <NavigationAction />
       
       {/* Список серверов */}
       <ScrollArea className="flex-1 w-full">

@@ -22,10 +22,16 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
     redirect("/sign-in");
   }
 
-  // Получаем канал
+  // Получаем канал и сервер
   const channel = await db.channel.findUnique({
     where: {
       id: channelId,
+    },
+  });
+
+  const server = await db.server.findUnique({
+    where: {
+      id: serverId,
     },
   });
 
@@ -37,7 +43,7 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
     },
   });
 
-  if (!channel || !member) {
+  if (!channel || !member || !server) {
     redirect("/");
   }
 
@@ -82,6 +88,9 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
       {channel.type === ChannelType.AUDIO && (
         <MediaRoom
           chatId={channel.id}
+          channelName={channel.name}
+          serverId={server.id}
+          serverName={server.name}
           video={false}
           audio={true}
         />
@@ -91,6 +100,9 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
       {channel.type === ChannelType.VIDEO && (
         <MediaRoom
           chatId={channel.id}
+          channelName={channel.name}
+          serverId={server.id}
+          serverName={server.name}
           video={true}
           audio={true}
         />

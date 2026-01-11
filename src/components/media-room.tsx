@@ -4,16 +4,44 @@ import { useEffect, useState } from "react";
 import { LiveKitRoom, VideoConference } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2 } from "lucide-react";
+import { useVoice } from "@/hooks/use-voice-store";
 
 interface MediaRoomProps {
   chatId: string;
+  channelName: string;
+  serverId: string;
+  serverName: string;
   video: boolean;
   audio: boolean;
 }
 
-export function MediaRoom({ chatId, video, audio }: MediaRoomProps) {
+export function MediaRoom({ 
+  chatId, 
+  channelName,
+  serverId,
+  serverName,
+  video, 
+  audio 
+}: MediaRoomProps) {
   const [token, setToken] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const { joinVoice, leaveVoice, activeChannelId } = useVoice();
+
+  // Присоединяемся к голосовому каналу при монтировании
+  useEffect(() => {
+    if (activeChannelId !== chatId) {
+      joinVoice({
+        channelId: chatId,
+        channelName,
+        serverId,
+        serverName,
+        isVideo: video,
+      });
+    }
+
+    // При размонтировании НЕ выходим автоматически
+    // Выход только по кнопке Leave
+  }, [chatId, channelName, serverId, serverName, video, joinVoice, activeChannelId]);
 
   useEffect(() => {
     const name = `Пользователь_${Math.random().toString(36).slice(2, 7)}`;
@@ -73,9 +101,9 @@ export function MediaRoom({ chatId, video, audio }: MediaRoomProps) {
       connect={true}
       video={video}
       audio={audio}
+      onDisconnected={() => leaveVoice()}
     >
       <VideoConference />
     </LiveKitRoom>
   );
 }
-

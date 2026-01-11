@@ -41,7 +41,7 @@ enum UserStatus {
 // Profile - Main user identity (synced with auth provider like Clerk)
 model Profile {
   id        String   @id @default(uuid())
-  oderId    String   @unique @default(cuid()) // Public ID for adding friends (shorter, like ECHO#1234)
+  oderId    String?  @unique @default(cuid()) // Public ID for adding friends (shorter, like ECHO#1234)
   userId    String   @unique // External auth provider ID (Clerk/NextAuth)
   name      String
   imageUrl  String   @db.Text

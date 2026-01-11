@@ -61,14 +61,20 @@ export async function POST(req: Request) {
     }
 
     const { oderId } = await req.json();
+    const searchId = oderId;
 
-    if (!oderId) {
+    if (!searchId) {
       return new NextResponse("User ID required", { status: 400 });
     }
 
-    // Находим пользователя по oderId
-    const targetProfile = await db.profile.findUnique({
-      where: { oderId },
+    // Находим пользователя по id или oderId
+    const targetProfile = await db.profile.findFirst({
+      where: {
+        OR: [
+          { id: searchId },
+          { oderId: searchId },
+        ],
+      },
     });
 
     if (!targetProfile) {

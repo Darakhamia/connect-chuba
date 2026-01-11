@@ -97,24 +97,26 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
         </div>
 
         <div className="space-y-2">
-          <Label className="text-zinc-300">ID пользователя</Label>
+          <Label className="text-zinc-300">ID для друзей</Label>
           <div className="flex gap-2">
             <Input
               value={profile.id}
               disabled
-              className="bg-zinc-900 border-zinc-700 text-zinc-500 font-mono text-sm"
+              className="bg-zinc-900 border-zinc-700 text-zinc-400 font-mono text-xs"
             />
             <Button
               variant="outline"
               size="sm"
-              className="border-zinc-600"
-              onClick={() => navigator.clipboard.writeText(profile.id)}
+              className="border-zinc-600 shrink-0"
+              onClick={() => {
+                navigator.clipboard.writeText(profile.id);
+              }}
             >
               Копировать
             </Button>
           </div>
           <p className="text-xs text-zinc-500">
-            Друзья могут добавить вас по этому ID
+            Отправьте этот ID другу чтобы он мог вас добавить
           </p>
         </div>
       </div>

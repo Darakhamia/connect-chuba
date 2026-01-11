@@ -91,6 +91,7 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
           channelName={channel.name}
           serverId={server.id}
           serverName={server.name}
+          username={profile.name}
           video={false}
           audio={true}
         />
@@ -103,6 +104,7 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
           channelName={channel.name}
           serverId={server.id}
           serverName={server.name}
+          username={profile.name}
           video={true}
           audio={true}
         />

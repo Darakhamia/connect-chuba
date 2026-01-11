@@ -1,18 +1,18 @@
 import { redirect } from "next/navigation";
 import { initialProfile } from "@/lib/initial-profile";
 import { db } from "@/lib/db";
-import { InitialModal } from "@/components/modals/initial-modal";
+import { HomeScreen } from "@/components/home/home-screen";
 
 /**
- * Главная страница приложения
- * Проверяет есть ли у пользователя серверы, если нет - показывает модал создания
+ * Главная страница ECHO
+ * Показывает домашний экран с друзьями и опцией создания/присоединения к серверам
  */
 export default async function HomePage() {
   // Получаем или создаём профиль пользователя
   const profile = await initialProfile();
 
-  // Ищем первый сервер, где пользователь является участником
-  const server = await db.server.findFirst({
+  // Получаем серверы пользователя
+  const servers = await db.server.findMany({
     where: {
       members: {
         some: {
@@ -22,12 +22,6 @@ export default async function HomePage() {
     },
   });
 
-  // Если есть сервер - редиректим на него
-  if (server) {
-    return redirect(`/servers/${server.id}`);
-  }
-
-  // Если нет серверов - показываем модал создания первого сервера
-  return <InitialModal />;
+  // Показываем домашний экран
+  return <HomeScreen profile={profile} hasServers={servers.length > 0} />;
 }
-

@@ -11,6 +11,7 @@ interface MediaRoomProps {
   channelName: string;
   serverId: string;
   serverName: string;
+  username: string;
   video: boolean;
   audio: boolean;
 }
@@ -20,6 +21,7 @@ export function MediaRoom({
   channelName,
   serverId,
   serverName,
+  username,
   video, 
   audio 
 }: MediaRoomProps) {
@@ -44,12 +46,10 @@ export function MediaRoom({
   }, [chatId, channelName, serverId, serverName, video, joinVoice, activeChannelId]);
 
   useEffect(() => {
-    const name = `Пользователь_${Math.random().toString(36).slice(2, 7)}`;
-
     (async () => {
       try {
         const resp = await fetch(
-          `/api/livekit?room=${chatId}&username=${name}`
+          `/api/livekit?room=${chatId}&username=${encodeURIComponent(username)}`
         );
         
         if (!resp.ok) {
@@ -69,7 +69,7 @@ export function MediaRoom({
         setError("Не удалось подключиться к серверу");
       }
     })();
-  }, [chatId]);
+  }, [chatId, username]);
 
   if (error) {
     return (

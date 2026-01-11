@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Profile } from "@prisma/client";
-import { Camera, Save } from "lucide-react";
+import { Camera, Save, Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +16,13 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
   const [name, setName] = useState(profile.name);
   const [bio, setBio] = useState(profile.bio || "");
   const [isLoading, setIsLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyId = () => {
+    navigator.clipboard.writeText(profile.id);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleSave = async () => {
     try {
@@ -107,12 +114,20 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
             <Button
               variant="outline"
               size="sm"
-              className="border-zinc-600 shrink-0"
-              onClick={() => {
-                navigator.clipboard.writeText(profile.id);
-              }}
+              className={`shrink-0 ${copied ? "border-green-500 text-green-500" : "border-zinc-600"}`}
+              onClick={handleCopyId}
             >
-              Копировать
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4 mr-1" />
+                  Скопировано
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4 mr-1" />
+                  Копировать
+                </>
+              )}
             </Button>
           </div>
           <p className="text-xs text-zinc-500">

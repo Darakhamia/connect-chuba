@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Profile } from "@prisma/client";
 import { UserPlus, Users, Clock, Check, X, MessageCircle, Phone, MoreVertical, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ interface FriendRequest {
 }
 
 export function FriendsList() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>("online");
   const [friends, setFriends] = useState<FriendWithProfile[]>([]);
   const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
@@ -36,6 +38,29 @@ export function FriendsList() {
   const [addFriendId, setAddFriendId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  // Начать чат с другом
+  const startChat = async (friendId: string) => {
+    try {
+      const res = await fetch("/api/dm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profileId: friendId }),
+      });
+
+      if (res.ok) {
+        const conversation = await res.json();
+        router.push(`/dm/${conversation.id}`);
+      }
+    } catch (error) {
+      console.error("Error starting chat:", error);
+    }
+  };
+
+  // Позвонить другу (пока заглушка)
+  const startCall = async (friendId: string) => {
+    alert("Звонки в разработке! Скоро будет доступно.");
+  };
 
   // Загрузка друзей
   useEffect(() => {
@@ -341,21 +366,12 @@ export function FriendsList() {
                           {friend.name.slice(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <div
-                        className={cn(
-                          "absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-zinc-800",
-                          friend.status === "ONLINE" ? "bg-green-500" :
-                          friend.status === "IDLE" ? "bg-yellow-500" :
-                          friend.status === "DND" ? "bg-red-500" : "bg-zinc-500"
-                        )}
-                      />
+                      <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-zinc-800 bg-green-500" />
                     </div>
                     <div>
                       <p className="font-medium text-white">{friend.name}</p>
                       <p className="text-xs text-zinc-400">
-                        {friend.status === "ONLINE" ? "В сети" :
-                         friend.status === "IDLE" ? "Не активен" :
-                         friend.status === "DND" ? "Не беспокоить" : "Не в сети"}
+                        В сети
                       </p>
                     </div>
                   </div>
@@ -364,6 +380,7 @@ export function FriendsList() {
                     <Button
                       size="icon"
                       variant="ghost"
+                      onClick={() => startChat(friend.id)}
                       className="h-9 w-9 rounded-full bg-zinc-700 hover:bg-zinc-600"
                     >
                       <MessageCircle className="w-5 h-5" />
@@ -371,6 +388,7 @@ export function FriendsList() {
                     <Button
                       size="icon"
                       variant="ghost"
+                      onClick={() => startCall(friend.id)}
                       className="h-9 w-9 rounded-full bg-zinc-700 hover:bg-zinc-600"
                     >
                       <Phone className="w-5 h-5" />

@@ -1,0 +1,243 @@
+// Connect Chuba - Discord Clone
+// Prisma Schema for PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum MemberRole {
+  ADMIN
+  MODERATOR
+  GUEST
+}
+
+enum ChannelType {
+  TEXT
+  AUDIO
+  VIDEO
+}
+
+enum UserStatus {
+  ONLINE
+  IDLE
+  DND        // Do Not Disturb
+  INVISIBLE
+  OFFLINE
+}
+
+// ==========================================
+// MODELS
+// ==========================================
+
+// Profile - Main user identity (synced with auth provider like Clerk)
+model Profile {
+  id        String   @id @default(uuid())
+  userId    String   @unique // External auth provider ID (Clerk/NextAuth)
+  name      String
+  imageUrl  String   @db.Text
+  email     String   @unique
+  bio       String?  @db.Text
+  status    UserStatus @default(OFFLINE)
+  
+  // Relations
+  servers   Server[]   // Servers owned by this user
+  members   Member[]   // Memberships in servers
+  channels  Channel[]  // Channels created by this user
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("profiles")
+}
+
+// Server - A community/guild
+model Server {
+  id         String   @id @default(uuid())
+  name       String
+  imageUrl   String   @db.Text
+  inviteCode String   @unique
+  
+  // Owner relation
+  profileId  String
+  profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  members    Member[]
+  categories Category[]
+  channels   Channel[]
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([profileId])
+  @@map("servers")
+}
+
+// Category - Organizes channels within a server
+model Category {
+  id       String    @id @default(uuid())
+  name     String
+  position Int       @default(0)
+  
+  // Server relation
+  serverId String
+  server   Server    @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  channels Channel[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([serverId])
+  @@map("categories")
+}
+
+// Member - User's membership in a server with role
+model Member {
+  id   String     @id @default(uuid())
+  role MemberRole @default(GUEST)
+  
+  // Profile relation
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  // Server relation
+  serverId String
+  server   Server  @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  messages              Message[]
+  directMessagesSent    DirectMessage[] @relation("DirectMessageSender")
+  directMessagesReceived DirectMessage[] @relation("DirectMessageReceiver")
+  
+  // Conversations as initiator or receiver
+  conversationsInitiated Conversation[] @relation("MemberOne")
+  conversationsReceived  Conversation[] @relation("MemberTwo")
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([profileId, serverId])
+  @@index([profileId])
+  @@index([serverId])
+  @@map("members")
+}
+
+// Channel - Text/Audio/Video channels within a server
+model Channel {
+  id       String      @id @default(uuid())
+  name     String
+  type     ChannelType @default(TEXT)
+  position Int         @default(0)
+  
+  // Creator relation
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  // Server relation
+  serverId String
+  server   Server  @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  
+  // Category relation (optional - channel can be uncategorized)
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  
+  // Relations
+  messages Message[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([profileId])
+  @@index([serverId])
+  @@index([categoryId])
+  @@map("channels")
+}
+
+// Message - Messages in text channels
+model Message {
+  id      String  @id @default(uuid())
+  content String  @db.Text
+  fileUrl String? @db.Text
+  
+  // Soft delete
+  deleted Boolean @default(false)
+  
+  // Author relation
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  // Channel relation
+  channelId String
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([memberId])
+  @@index([channelId])
+  @@map("messages")
+}
+
+// Conversation - Direct message threads between two members
+model Conversation {
+  id String @id @default(uuid())
+  
+  // Two members in the conversation
+  memberOneId String
+  memberOne   Member @relation("MemberOne", fields: [memberOneId], references: [id], onDelete: Cascade)
+  
+  memberTwoId String
+  memberTwo   Member @relation("MemberTwo", fields: [memberTwoId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  directMessages DirectMessage[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([memberOneId, memberTwoId])
+  @@index([memberOneId])
+  @@index([memberTwoId])
+  @@map("conversations")
+}
+
+// DirectMessage - Messages in direct conversations
+model DirectMessage {
+  id      String  @id @default(uuid())
+  content String  @db.Text
+  fileUrl String? @db.Text
+  
+  // Soft delete
+  deleted Boolean @default(false)
+  
+  // Sender relation
+  senderId String
+  sender   Member @relation("DirectMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  
+  // Receiver relation
+  receiverId String
+  receiver   Member @relation("DirectMessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  
+  // Conversation relation
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([conversationId])
+  @@map("direct_messages")
+}

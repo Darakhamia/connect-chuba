@@ -1,0 +1,329 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================
+   Connect Chuba - Custom Theme System
+   Discord-inspired with customizable accent colors
+   ========================================== */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  
+  /* Sidebar colors */
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  
+  /* Chart colors */
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  
+  /* Core UI colors */
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  
+  /* Radius */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  
+  /* Custom Discord-like colors */
+  --color-discord-blurple: var(--discord-blurple);
+  --color-discord-green: var(--discord-green);
+  --color-discord-yellow: var(--discord-yellow);
+  --color-discord-fuchsia: var(--discord-fuchsia);
+  --color-discord-red: var(--discord-red);
+  
+  /* Server sidebar specific */
+  --color-server-sidebar: var(--server-sidebar);
+  --color-channel-sidebar: var(--channel-sidebar);
+  --color-chat-area: var(--chat-area);
+  --color-chat-input: var(--chat-input);
+  --color-user-panel: var(--user-panel);
+}
+
+/* ==========================================
+   Light Theme (Clean & Modern)
+   ========================================== */
+:root {
+  --radius: 0.5rem;
+  
+  /* Base colors */
+  --background: #ffffff;
+  --foreground: #2e3338;
+  
+  /* Card & Popover */
+  --card: #ffffff;
+  --card-foreground: #2e3338;
+  --popover: #ffffff;
+  --popover-foreground: #2e3338;
+  
+  /* Primary - Brand color (customizable) */
+  --primary: #5865f2;
+  --primary-foreground: #ffffff;
+  
+  /* Secondary */
+  --secondary: #f2f3f5;
+  --secondary-foreground: #2e3338;
+  
+  /* Muted */
+  --muted: #f2f3f5;
+  --muted-foreground: #6d6f78;
+  
+  /* Accent */
+  --accent: #5865f2;
+  --accent-foreground: #ffffff;
+  
+  /* Destructive */
+  --destructive: #ed4245;
+  
+  /* Border & Input */
+  --border: #e3e5e8;
+  --input: #e3e5e8;
+  --ring: #5865f2;
+  
+  /* Discord brand colors */
+  --discord-blurple: #5865f2;
+  --discord-green: #57f287;
+  --discord-yellow: #fee75c;
+  --discord-fuchsia: #eb459e;
+  --discord-red: #ed4245;
+  
+  /* Layout specific colors */
+  --server-sidebar: #e3e5e8;
+  --channel-sidebar: #f2f3f5;
+  --chat-area: #ffffff;
+  --chat-input: #ebedef;
+  --user-panel: #ebedef;
+  
+  /* Sidebar */
+  --sidebar: #f2f3f5;
+  --sidebar-foreground: #2e3338;
+  --sidebar-primary: #5865f2;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e3e5e8;
+  --sidebar-accent-foreground: #2e3338;
+  --sidebar-border: #d4d7dc;
+  --sidebar-ring: #5865f2;
+  
+  /* Charts */
+  --chart-1: #5865f2;
+  --chart-2: #57f287;
+  --chart-3: #fee75c;
+  --chart-4: #eb459e;
+  --chart-5: #ed4245;
+}
+
+/* ==========================================
+   Dark Theme (Discord-inspired)
+   ========================================== */
+.dark {
+  /* Base colors */
+  --background: #313338;
+  --foreground: #dbdee1;
+  
+  /* Card & Popover */
+  --card: #2b2d31;
+  --card-foreground: #dbdee1;
+  --popover: #1e1f22;
+  --popover-foreground: #dbdee1;
+  
+  /* Primary - Brand color (customizable) */
+  --primary: #5865f2;
+  --primary-foreground: #ffffff;
+  
+  /* Secondary */
+  --secondary: #2b2d31;
+  --secondary-foreground: #dbdee1;
+  
+  /* Muted */
+  --muted: #2b2d31;
+  --muted-foreground: #949ba4;
+  
+  /* Accent */
+  --accent: #5865f2;
+  --accent-foreground: #ffffff;
+  
+  /* Destructive */
+  --destructive: #f23f42;
+  
+  /* Border & Input */
+  --border: #3f4147;
+  --input: #1e1f22;
+  --ring: #5865f2;
+  
+  /* Discord brand colors (same in both themes) */
+  --discord-blurple: #5865f2;
+  --discord-green: #23a55a;
+  --discord-yellow: #f0b132;
+  --discord-fuchsia: #eb459e;
+  --discord-red: #f23f42;
+  
+  /* Layout specific colors */
+  --server-sidebar: #1e1f22;
+  --channel-sidebar: #2b2d31;
+  --chat-area: #313338;
+  --chat-input: #383a40;
+  --user-panel: #232428;
+  
+  /* Sidebar */
+  --sidebar: #2b2d31;
+  --sidebar-foreground: #f2f3f5;
+  --sidebar-primary: #5865f2;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #35373c;
+  --sidebar-accent-foreground: #dbdee1;
+  --sidebar-border: #3f4147;
+  --sidebar-ring: #5865f2;
+  
+  /* Charts */
+  --chart-1: #5865f2;
+  --chart-2: #23a55a;
+  --chart-3: #f0b132;
+  --chart-4: #eb459e;
+  --chart-5: #f23f42;
+}
+
+/* ==========================================
+   Base Styles
+   ========================================== */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Custom scrollbar for dark mode */
+  .dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .dark ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .dark ::-webkit-scrollbar-thumb {
+    background: #1e1f22;
+    border-radius: 4px;
+  }
+  
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #3f4147;
+  }
+}
+
+/* ==========================================
+   Custom Utility Classes
+   ========================================== */
+@layer utilities {
+  /* Discord-like hover effects */
+  .server-icon-hover {
+    @apply transition-all duration-200 ease-out;
+  }
+  
+  .server-icon-hover:hover {
+    border-radius: 35%;
+  }
+  
+  /* Pill indicator for active server */
+  .server-pill {
+    @apply absolute left-0 bg-foreground rounded-r-full transition-all duration-200;
+  }
+  
+  /* Channel hover effect */
+  .channel-hover {
+    @apply transition-colors duration-150;
+  }
+  
+  .channel-hover:hover {
+    @apply bg-sidebar-accent;
+  }
+  
+  /* Flex utilities */
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+}
+
+/* ==========================================
+   Animation Keyframes
+   ========================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 var(--discord-blurple);
+  }
+  70% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

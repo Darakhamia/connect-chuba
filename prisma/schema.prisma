@@ -41,6 +41,7 @@ enum UserStatus {
 // Profile - Main user identity (synced with auth provider like Clerk)
 model Profile {
   id        String   @id @default(uuid())
+  oderId    String   @unique @default(cuid()) // Public ID for adding friends (shorter, like ECHO#1234)
   userId    String   @unique // External auth provider ID (Clerk/NextAuth)
   name      String
   imageUrl  String   @db.Text
@@ -52,6 +53,17 @@ model Profile {
   servers   Server[]   // Servers owned by this user
   members   Member[]   // Memberships in servers
   channels  Channel[]  // Channels created by this user
+  
+  // Friend relations
+  friendRequestsSent     FriendRequest[] @relation("FriendRequestSender")
+  friendRequestsReceived FriendRequest[] @relation("FriendRequestReceiver")
+  friendshipsInitiated   Friendship[] @relation("FriendOne")
+  friendshipsReceived    Friendship[] @relation("FriendTwo")
+  
+  // DM conversations (direct, not server-based)
+  dmConversationsOne DMConversation[] @relation("DMProfileOne")
+  dmConversationsTwo DMConversation[] @relation("DMProfileTwo")
+  dmMessagesSent     DMMessage[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -212,7 +224,7 @@ model Conversation {
   @@map("conversations")
 }
 
-// DirectMessage - Messages in direct conversations
+// DirectMessage - Messages in direct conversations (server-based)
 model DirectMessage {
   id      String  @id @default(uuid())
   content String  @db.Text
@@ -240,4 +252,103 @@ model DirectMessage {
   @@index([receiverId])
   @@index([conversationId])
   @@map("direct_messages")
+}
+
+// ==========================================
+// FRIEND SYSTEM MODELS
+// ==========================================
+
+enum FriendRequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+// FriendRequest - Pending friend requests between profiles
+model FriendRequest {
+  id     String              @id @default(uuid())
+  status FriendRequestStatus @default(PENDING)
+  
+  // Sender profile
+  senderId String
+  sender   Profile @relation("FriendRequestSender", fields: [senderId], references: [id], onDelete: Cascade)
+  
+  // Receiver profile
+  receiverId String
+  receiver   Profile @relation("FriendRequestReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([senderId, receiverId])
+  @@index([senderId])
+  @@index([receiverId])
+  @@map("friend_requests")
+}
+
+// Friendship - Confirmed friendships between profiles
+model Friendship {
+  id String @id @default(uuid())
+  
+  // Two friends
+  profileOneId String
+  profileOne   Profile @relation("FriendOne", fields: [profileOneId], references: [id], onDelete: Cascade)
+  
+  profileTwoId String
+  profileTwo   Profile @relation("FriendTwo", fields: [profileTwoId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+
+  @@unique([profileOneId, profileTwoId])
+  @@index([profileOneId])
+  @@index([profileTwoId])
+  @@map("friendships")
+}
+
+// DMConversation - Direct message conversations between profiles (not server-based)
+model DMConversation {
+  id String @id @default(uuid())
+  
+  // Two profiles in the conversation
+  profileOneId String
+  profileOne   Profile @relation("DMProfileOne", fields: [profileOneId], references: [id], onDelete: Cascade)
+  
+  profileTwoId String
+  profileTwo   Profile @relation("DMProfileTwo", fields: [profileTwoId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  messages DMMessage[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([profileOneId, profileTwoId])
+  @@index([profileOneId])
+  @@index([profileTwoId])
+  @@map("dm_conversations")
+}
+
+// DMMessage - Messages in DM conversations between profiles
+model DMMessage {
+  id      String  @id @default(uuid())
+  content String  @db.Text
+  fileUrl String? @db.Text
+  
+  // Soft delete
+  deleted Boolean @default(false)
+  
+  // Sender profile
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  // Conversation relation
+  conversationId String
+  conversation   DMConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([profileId])
+  @@index([conversationId])
+  @@map("dm_messages")
 }

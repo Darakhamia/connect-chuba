@@ -56,6 +56,17 @@ export function MusicPanel({ serverId, voiceChannelId, onClose }: MusicPanelProp
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [isSeeking, setIsSeeking] = useState(false);
   const seekTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isMountedRef = useRef(true);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      if (seekTimeoutRef.current) {
+        clearTimeout(seekTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     initSession();
@@ -179,7 +190,7 @@ export function MusicPanel({ serverId, voiceChannelId, onClose }: MusicPanelProp
   };
 
   const handleControl = async (action: string, value?: any) => {
-    if (!session) return;
+    if (!session || !isMountedRef.current) return;
 
     try {
       const res = await fetch(`/api/music/session/${session.id}/control`, {
@@ -188,7 +199,7 @@ export function MusicPanel({ serverId, voiceChannelId, onClose }: MusicPanelProp
         body: JSON.stringify({ action, value }),
       });
 
-      if (res.ok) {
+      if (res.ok && isMountedRef.current) {
         // Immediate UI update for better responsiveness
         if (action === "play") {
           setSession({ ...session, state: "PLAYING" });
@@ -196,7 +207,9 @@ export function MusicPanel({ serverId, voiceChannelId, onClose }: MusicPanelProp
           setSession({ ...session, state: "PAUSED" });
         }
         // Fetch full state after a short delay
-        setTimeout(fetchSessionState, 200);
+        setTimeout(() => {
+          if (isMountedRef.current) fetchSessionState();
+        }, 200);
       }
     } catch (error) {
       console.error("Control error:", error);
@@ -204,7 +217,7 @@ export function MusicPanel({ serverId, voiceChannelId, onClose }: MusicPanelProp
   };
 
   const handleSeek = (positionMs: number) => {
-    if (!session) return;
+    if (!session || !isMountedRef.current) return;
     
     // Update UI immediately for smooth experience
     setSession({ ...session, currentPositionMs: positionMs });
@@ -216,13 +229,15 @@ export function MusicPanel({ serverId, voiceChannelId, onClose }: MusicPanelProp
     }
 
     seekTimeoutRef.current = setTimeout(() => {
-      handleControl("seek", positionMs);
-      setIsSeeking(false);
+      if (isMountedRef.current) {
+        handleControl("seek", positionMs);
+        setIsSeeking(false);
+      }
     }, 500); // Wait 500ms after user stops dragging
   };
 
   const handleSkipSeconds = (seconds: number) => {
-    if (!session?.currentTrack) return;
+    if (!session?.currentTrack || !isMountedRef.current) return;
     const newPosition = Math.max(0, Math.min(
       session.currentPositionMs + (seconds * 1000),
       session.currentTrack.durationMs
@@ -238,6 +253,7 @@ export function MusicPanel({ serverId, voiceChannelId, onClose }: MusicPanelProp
   };
 
   const handleTrackEnded = () => {
+    if (!isMountedRef.current) return;
     // Auto-skip to next track
     handleControl("skip");
   };

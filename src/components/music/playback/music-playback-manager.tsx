@@ -41,11 +41,22 @@ export function MusicPlaybackManager({
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isReady, setIsReady] = useState(false);
   const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isMountedRef = useRef(true); // Track if component is mounted
 
   // Controllers
   const youtubeController = createYouTubeController(youtubePlayerRef);
   const appleMusicController = createAppleMusicController(appleMusicRef);
   const soundCloudController = createSoundCloudController(soundCloudRef);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      if (syncIntervalRef.current) {
+        clearInterval(syncIntervalRef.current);
+      }
+    };
+  }, []);
 
   // Initialize playback when track changes
   useEffect(() => {
@@ -224,12 +235,14 @@ export function MusicPlaybackManager({
   };
 
   const handleYouTubeReady = () => {
+    if (!isMountedRef.current) return;
     console.log("YouTube ready");
     setIsReady(true);
     youtubeController.setVolume(volume);
   };
 
   const handleYouTubeStateChange = (ytState: number) => {
+    if (!isMountedRef.current) return;
     if (ytState === YT_STATE.ENDED) {
       console.log("YouTube track ended");
       onEnded?.();
@@ -237,11 +250,13 @@ export function MusicPlaybackManager({
   };
 
   const handleAudioEnded = () => {
+    if (!isMountedRef.current) return;
     console.log("Audio track ended");
     onEnded?.();
   };
 
   const handleAudioReady = () => {
+    if (!isMountedRef.current) return;
     console.log("Audio ready");
     setIsReady(true);
     if (audioRef.current) {
@@ -250,12 +265,14 @@ export function MusicPlaybackManager({
   };
 
   const handleAppleMusicReady = () => {
+    if (!isMountedRef.current) return;
     console.log("Apple Music ready");
     setIsReady(true);
     appleMusicController.setVolume(volume);
   };
 
   const handleAppleMusicStateChange = (state: "playing" | "paused" | "stopped" | "ended") => {
+    if (!isMountedRef.current) return;
     if (state === "ended") {
       console.log("Apple Music track ended");
       onEnded?.();
@@ -263,12 +280,14 @@ export function MusicPlaybackManager({
   };
 
   const handleSoundCloudReady = () => {
+    if (!isMountedRef.current) return;
     console.log("SoundCloud ready");
     setIsReady(true);
     soundCloudController.setVolume(volume);
   };
 
   const handleSoundCloudStateChange = (state: "playing" | "paused" | "stopped" | "ended") => {
+    if (!isMountedRef.current) return;
     if (state === "ended") {
       console.log("SoundCloud track ended");
       onEnded?.();

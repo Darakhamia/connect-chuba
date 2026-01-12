@@ -1,18 +1,62 @@
 "use client";
 
-import { X, Upload, FileIcon } from "lucide-react";
+import { X, Upload, FileIcon, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { UploadDropzone } from "@uploadthing/react";
-import { OurFileRouter } from "@/app/api/uploadthing/core";
+import { useState, useRef } from "react";
+import { toast } from "sonner";
 
 interface FileUploadProps {
-  endpoint: keyof OurFileRouter;
+  endpoint: string;
   value: string;
   onChange: (url?: string) => void;
 }
 
 export function FileUpload({ endpoint, value, onChange }: FileUploadProps) {
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const fileType = value?.split(".").pop();
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Только изображения разрешены");
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Файл слишком большой. Максимум 5MB");
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const data = await response.json();
+      onChange(data.url);
+      toast.success("Файл загружен!");
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Ошибка загрузки файла");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   // Если есть изображение
   if (value && fileType !== "pdf") {
@@ -59,33 +103,41 @@ export function FileUpload({ endpoint, value, onChange }: FileUploadProps) {
     );
   }
 
-  // Dropzone для загрузки
+  // Upload area
   return (
-    <UploadDropzone<OurFileRouter, typeof endpoint>
-      endpoint={endpoint}
-      onClientUploadComplete={(res) => {
-        onChange(res?.[0]?.url);
-      }}
-      onUploadError={(error: Error) => {
-        console.error("Upload error:", error);
-        alert(`Ошибка загрузки: ${error.message}`);
-      }}
-      appearance={{
-        container: "border-dashed border-2 border-muted-foreground/25 rounded-lg",
-        label: "text-muted-foreground",
-        allowedContent: "text-muted-foreground/70 text-xs",
-        button: "bg-primary text-primary-foreground hover:bg-primary/90 ut-uploading:bg-primary/70",
-      }}
-      content={{
-        label: () => (
-          <div className="flex flex-col items-center gap-2">
+    <div className="border-dashed border-2 border-muted-foreground/25 rounded-lg p-6">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden"
+        disabled={isUploading}
+      />
+      <button
+        type="button"
+        onClick={() => fileInputRef.current?.click()}
+        disabled={isUploading}
+        className="w-full flex flex-col items-center gap-2 py-4 hover:bg-muted/50 rounded transition"
+      >
+        {isUploading ? (
+          <>
+            <Loader2 className="h-10 w-10 text-muted-foreground animate-spin" />
+            <span className="text-sm text-muted-foreground">Загрузка...</span>
+          </>
+        ) : (
+          <>
             <Upload className="h-10 w-10 text-muted-foreground" />
-            <span>Перетащите файл или нажмите для выбора</span>
-          </div>
-        ),
-        allowedContent: "Изображение до 4MB",
-      }}
-    />
+            <span className="text-sm text-muted-foreground">
+              Нажмите для выбора файла
+            </span>
+            <span className="text-xs text-muted-foreground/70">
+              Изображение до 5MB
+            </span>
+          </>
+        )}
+      </button>
+    </div>
   );
 }
 

@@ -103,12 +103,19 @@ export function SoundCloudPlayer({
     return () => {
       clearTimeout(initTimeout);
       if (widgetRef.current) {
-        widgetRef.current.unbind(window.SC.Widget.Events.READY);
-        widgetRef.current.unbind(window.SC.Widget.Events.PLAY);
-        widgetRef.current.unbind(window.SC.Widget.Events.PAUSE);
-        widgetRef.current.unbind(window.SC.Widget.Events.FINISH);
-        widgetRef.current.unbind(window.SC.Widget.Events.ERROR);
+        try {
+          widgetRef.current.unbind(window.SC.Widget.Events.READY);
+          widgetRef.current.unbind(window.SC.Widget.Events.PLAY);
+          widgetRef.current.unbind(window.SC.Widget.Events.PAUSE);
+          widgetRef.current.unbind(window.SC.Widget.Events.FINISH);
+          widgetRef.current.unbind(window.SC.Widget.Events.ERROR);
+        } catch (e) {
+          // Widget already destroyed, ignore
+        }
+        widgetRef.current = null;
       }
+      // Clear global reference
+      (window as any).__soundCloudWidget = null;
     };
   }, [isScriptLoaded, url]);
 
@@ -177,8 +184,12 @@ export function createSoundCloudController(widgetRef?: React.RefObject<any>) {
       console.log("🎵 SoundCloud controller: play()");
       const widget = getWidget();
       if (widget) {
-        widget.play();
-        console.log("▶️ SoundCloud play command sent");
+        try {
+          widget.play();
+          console.log("▶️ SoundCloud play command sent");
+        } catch (e) {
+          console.error("❌ SoundCloud play error:", e);
+        }
       } else {
         console.error("❌ SoundCloud widget not available");
       }
@@ -187,14 +198,22 @@ export function createSoundCloudController(widgetRef?: React.RefObject<any>) {
       console.log("⏸️ SoundCloud controller: pause()");
       const widget = getWidget();
       if (widget) {
-        widget.pause();
+        try {
+          widget.pause();
+        } catch (e) {
+          console.error("❌ SoundCloud pause error:", e);
+        }
       }
     },
     seekTo: (seconds: number) => {
       console.log("⏩ SoundCloud controller: seekTo", seconds);
       const widget = getWidget();
       if (widget) {
-        widget.seekTo(seconds * 1000); // SoundCloud uses milliseconds
+        try {
+          widget.seekTo(seconds * 1000); // SoundCloud uses milliseconds
+        } catch (e) {
+          console.error("❌ SoundCloud seekTo error:", e);
+        }
       }
     },
     getCurrentTime: (callback: (time: number) => void) => {
@@ -203,15 +222,24 @@ export function createSoundCloudController(widgetRef?: React.RefObject<any>) {
         callback(0);
         return;
       }
-      widget.getPosition((position: number) => {
-        callback(position / 1000); // Convert ms to seconds
-      });
+      try {
+        widget.getPosition((position: number) => {
+          callback(position / 1000); // Convert ms to seconds
+        });
+      } catch (e) {
+        console.error("❌ SoundCloud getCurrentTime error:", e);
+        callback(0);
+      }
     },
     setVolume: (volume: number) => {
       console.log("🔊 SoundCloud controller: setVolume", volume);
       const widget = getWidget();
       if (widget) {
-        widget.setVolume(volume);
+        try {
+          widget.setVolume(volume);
+        } catch (e) {
+          console.error("❌ SoundCloud setVolume error:", e);
+        }
       }
     },
   };

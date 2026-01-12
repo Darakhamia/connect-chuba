@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { NavigationAction } from "./navigation-action";
 import { NavigationItem } from "./navigation-item";
 import { NavigationHome } from "./navigation-home";
+import { NavigationSettings } from "./navigation-settings";
 
 export async function NavigationSidebar() {
   const profile = await currentProfile();
@@ -48,6 +49,10 @@ export async function NavigationSidebar() {
         ))}
       </ScrollArea>
       
+      <Separator className="h-[2px] w-10 bg-border rounded-full mx-auto" />
+      
+      {/* Кнопка настроек */}
+      <NavigationSettings />
     </div>
   );
 }

@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useClerk } from "@clerk/nextjs";
 import { Profile, UserStatus } from "@prisma/client";
-import { Settings, Circle, Moon, MinusCircle, Eye, EyeOff } from "lucide-react";
+import { Settings, Circle, Moon, MinusCircle, EyeOff, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -28,10 +29,20 @@ const statusOptions = [
 
 export function UserPanel({ profile }: UserPanelProps) {
   const router = useRouter();
+  const { signOut } = useClerk();
   const [status, setStatus] = useState<UserStatus>(profile.status || "ONLINE");
   const [isUpdating, setIsUpdating] = useState(false);
 
   const currentStatus = statusOptions.find(s => s.value === status) || statusOptions[0];
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.push("/sign-in");
+    } catch (error) {
+      toast.error("Ошибка при выходе");
+    }
+  };
 
   const handleStatusChange = async (newStatus: UserStatus) => {
     if (isUpdating) return;
@@ -147,6 +158,17 @@ export function UserPanel({ profile }: UserPanelProps) {
           >
             <Settings className="w-4 h-4 mr-2" />
             Настройки
+          </DropdownMenuItem>
+          
+          <DropdownMenuSeparator className="bg-zinc-800" />
+          
+          {/* Logout */}
+          <DropdownMenuItem
+            onClick={handleSignOut}
+            className="cursor-pointer text-red-500 focus:text-red-500"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Выйти
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

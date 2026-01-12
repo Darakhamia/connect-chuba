@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 interface SettingsState {
   // Appearance
   accentColor: string;
+  backgroundColor: string; // New - background theme color
   fontSize: number;
   messageDisplay: "compact" | "cozy";
   
@@ -32,6 +33,7 @@ interface SettingsState {
   
   // Actions
   setAccentColor: (color: string) => void;
+  setBackgroundColor: (color: string) => void;
   setFontSize: (size: number) => void;
   setMessageDisplay: (display: "compact" | "cozy") => void;
   
@@ -55,6 +57,7 @@ export const useSettings = create<SettingsState>()(
     (set) => ({
       // Default values
       accentColor: "indigo",
+      backgroundColor: "dark", // dark, darker, midnight, amoled
       fontSize: 14,
       messageDisplay: "cozy",
       
@@ -81,6 +84,7 @@ export const useSettings = create<SettingsState>()(
       
       // Actions
       setAccentColor: (color) => set({ accentColor: color }),
+      setBackgroundColor: (color) => set({ backgroundColor: color }),
       setFontSize: (size) => set({ fontSize: size }),
       setMessageDisplay: (display) => set({ messageDisplay: display }),
       

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { currentProfile } from "@/lib/current-profile";
 import { db } from "@/lib/db";
 import { DMChatArea } from "@/components/dm/dm-chat-area";
+import { DMSidebar } from "@/components/dm/dm-sidebar";
 
 interface DMPageProps {
   params: Promise<{
@@ -43,10 +44,18 @@ export default async function DMPage({ params }: DMPageProps) {
     : conversation.profileOne;
 
   return (
-    <DMChatArea
-      conversationId={conversation.id}
-      currentProfile={profile}
-      otherProfile={otherProfile}
-    />
+    <div className="h-full flex">
+      {/* DM Sidebar */}
+      <DMSidebar profile={profile} />
+      
+      {/* Chat Area */}
+      <div className="flex-1">
+        <DMChatArea
+          conversationId={conversation.id}
+          currentProfile={profile}
+          otherProfile={otherProfile}
+        />
+      </div>
+    </div>
   );
 }

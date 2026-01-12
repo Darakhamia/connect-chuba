@@ -35,25 +35,37 @@ export function SoundCloudPlayer({
 
   // Initialize widget when script is loaded
   useEffect(() => {
-    if (!isScriptLoaded || !iframeRef.current) return;
+    if (!isScriptLoaded || !iframeRef.current) {
+      console.log("⏳ Waiting for script or iframe...", { isScriptLoaded, hasIframe: !!iframeRef.current });
+      return;
+    }
 
-    console.log("Initializing SoundCloud widget for URL:", url);
+    console.log("🔧 Initializing SoundCloud widget for URL:", url);
 
-    try {
-      widgetRef.current = window.SC.Widget(iframeRef.current);
+    // Give iframe some time to load before initializing widget
+    const initTimeout = setTimeout(() => {
+      try {
+        if (!window.SC || !window.SC.Widget) {
+          console.error("❌ window.SC.Widget is not available!");
+          onError?.(new Error("SoundCloud Widget API not loaded"));
+          return;
+        }
 
-      // Bind events
-      widgetRef.current.bind(window.SC.Widget.Events.READY, () => {
-        console.log("✅ SoundCloud widget ready!");
-        setIsWidgetReady(true);
-        
-        // Get current track info for debugging
-        widgetRef.current.getCurrentSound((sound: any) => {
-          console.log("Current SoundCloud track:", sound);
+        widgetRef.current = window.SC.Widget(iframeRef.current);
+        console.log("📦 Widget instance created:", widgetRef.current);
+
+        // Bind events
+        widgetRef.current.bind(window.SC.Widget.Events.READY, () => {
+          console.log("✅ SoundCloud widget ready!");
+          setIsWidgetReady(true);
+          
+          // Get current track info for debugging
+          widgetRef.current.getCurrentSound((sound: any) => {
+            console.log("🎵 Current SoundCloud track:", sound);
+          });
+          
+          onReady?.();
         });
-        
-        onReady?.();
-      });
 
       widgetRef.current.bind(window.SC.Widget.Events.PLAY, () => {
         console.log("▶️ SoundCloud started playing");
@@ -75,12 +87,14 @@ export function SoundCloudPlayer({
         onError?.(error);
       });
 
-    } catch (error) {
-      console.error("Failed to initialize SoundCloud widget:", error);
-      onError?.(error);
-    }
+      } catch (error) {
+        console.error("❌ Failed to initialize SoundCloud widget:", error);
+        onError?.(error);
+      }
+    }, 500); // Wait 500ms for iframe to load
 
     return () => {
+      clearTimeout(initTimeout);
       if (widgetRef.current) {
         widgetRef.current.unbind(window.SC.Widget.Events.READY);
         widgetRef.current.unbind(window.SC.Widget.Events.PLAY);
@@ -89,7 +103,7 @@ export function SoundCloudPlayer({
         widgetRef.current.unbind(window.SC.Widget.Events.ERROR);
       }
     };
-  }, [isScriptLoaded]);
+  }, [isScriptLoaded, url]);
 
   // Update URL when it changes
   useEffect(() => {
@@ -106,7 +120,9 @@ export function SoundCloudPlayer({
     });
   }, [url]);
 
-  const embedUrl = `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&auto_play=false&buying=false&sharing=false&show_artwork=false&show_comments=false&show_playcount=false&show_user=false`;
+  const embedUrl = `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&auto_play=false&buying=false&sharing=false&show_artwork=true&show_comments=false&show_playcount=false&show_user=false`;
+
+  console.log("🔗 SoundCloud embed URL:", embedUrl);
 
   return (
     <>
@@ -114,7 +130,7 @@ export function SoundCloudPlayer({
         src="https://w.soundcloud.com/player/api.js"
         onLoad={handleScriptLoad}
         onError={(e) => {
-          console.error("Failed to load SoundCloud Widget API:", e);
+          console.error("❌ Failed to load SoundCloud Widget API:", e);
           onError?.(e);
         }}
       />
@@ -129,6 +145,12 @@ export function SoundCloudPlayer({
         frameBorder="no"
         allow="autoplay"
         className="hidden"
+        onLoad={() => {
+          console.log("📦 SoundCloud iframe loaded");
+        }}
+        onError={(e) => {
+          console.error("❌ SoundCloud iframe error:", e);
+        }}
       />
     </>
   );

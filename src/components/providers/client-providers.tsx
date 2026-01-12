@@ -5,19 +5,22 @@ import { ModalProvider } from "@/components/providers/modal-provider";
 import { SocketProvider } from "@/components/providers/socket-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { AppearanceProvider } from "@/components/providers/appearance-provider";
+import { NotificationProvider } from "@/components/providers/notification-provider";
 import { VoiceStatusBar } from "@/components/voice-status-bar";
 
 export function ClientProviders({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="connect-chuba-theme">
       <AppearanceProvider>
-        <SocketProvider>
-          <QueryProvider>
-            <ModalProvider />
-            {children}
-            <VoiceStatusBar />
-          </QueryProvider>
-        </SocketProvider>
+        <NotificationProvider>
+          <SocketProvider>
+            <QueryProvider>
+              <ModalProvider />
+              {children}
+              <VoiceStatusBar />
+            </QueryProvider>
+          </SocketProvider>
+        </NotificationProvider>
       </AppearanceProvider>
     </ThemeProvider>
   );

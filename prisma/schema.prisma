@@ -129,8 +129,10 @@ model Member {
   
   // Relations
   messages              Message[]
+  messageReactions      MessageReaction[]
   directMessagesSent    DirectMessage[] @relation("DirectMessageSender")
   directMessagesReceived DirectMessage[] @relation("DirectMessageReceiver")
+  dmMessageReactions    DMMessageReaction[]
   
   // Conversations as initiator or receiver
   conversationsInitiated Conversation[] @relation("MemberOne")
@@ -185,6 +187,9 @@ model Message {
   // Soft delete
   deleted Boolean @default(false)
   
+  // Pinned message
+  pinned Boolean @default(false)
+  
   // Author relation
   memberId String
   member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
@@ -193,12 +198,38 @@ model Message {
   channelId String
   channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   
+  // Reactions
+  reactions MessageReaction[]
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([memberId])
   @@index([channelId])
   @@map("messages")
+}
+
+// MessageReaction - Reactions to messages
+model MessageReaction {
+  id String @id @default(uuid())
+  
+  // Emoji
+  emoji String
+  
+  // Message relation
+  messageId String
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  // Member who reacted
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+
+  @@unique([messageId, memberId, emoji])
+  @@index([messageId])
+  @@index([memberId])
+  @@map("message_reactions")
 }
 
 // Conversation - Direct message threads between two members
@@ -337,6 +368,9 @@ model DMMessage {
   // Soft delete
   deleted Boolean @default(false)
   
+  // Pinned message
+  pinned Boolean @default(false)
+  
   // Sender profile
   profileId String
   profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
@@ -345,10 +379,36 @@ model DMMessage {
   conversationId String
   conversation   DMConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   
+  // Reactions
+  reactions DMMessageReaction[]
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([profileId])
   @@index([conversationId])
   @@map("dm_messages")
+}
+
+// DMMessageReaction - Reactions to DM messages
+model DMMessageReaction {
+  id String @id @default(uuid())
+  
+  // Emoji
+  emoji String
+  
+  // Message relation
+  messageId String
+  message   DMMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  // Member who reacted (from any server they share)
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+
+  @@unique([messageId, memberId, emoji])
+  @@index([messageId])
+  @@index([memberId])
+  @@map("dm_message_reactions")
 }

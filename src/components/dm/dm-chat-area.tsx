@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Profile } from "@prisma/client";
-import { Phone, Video, MoreVertical, SendHorizontal, Plus, Smile } from "lucide-react";
+import { Phone, Video, MoreVertical, SendHorizontal, Plus, Smile, PhoneOff } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { DMCall } from "./dm-call";
+import { useModal } from "@/hooks/use-modal-store";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 
@@ -25,9 +27,12 @@ interface DMChatAreaProps {
 }
 
 export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMChatAreaProps) {
+  const { onOpen } = useModal();
   const [messages, setMessages] = useState<DMMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isInCall, setIsInCall] = useState(false);
+  const [isVideoCall, setIsVideoCall] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Загружаем сообщения
@@ -99,20 +104,63 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
         </div>
         
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white">
-            <Phone className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white">
-            <Video className="h-5 w-5" />
-          </Button>
+          {isInCall ? (
+            <Button 
+              variant="destructive" 
+              size="icon" 
+              onClick={() => setIsInCall(false)}
+              title="Завершить звонок"
+            >
+              <PhoneOff className="h-5 w-5" />
+            </Button>
+          ) : (
+            <>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="text-zinc-400 hover:text-white"
+                onClick={() => {
+                  setIsVideoCall(false);
+                  setIsInCall(true);
+                }}
+                title="Голосовой звонок"
+              >
+                <Phone className="h-5 w-5" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="text-zinc-400 hover:text-white"
+                onClick={() => {
+                  setIsVideoCall(true);
+                  setIsInCall(true);
+                }}
+                title="Видео звонок"
+              >
+                <Video className="h-5 w-5" />
+              </Button>
+            </>
+          )}
           <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white">
             <MoreVertical className="h-5 w-5" />
           </Button>
         </div>
       </div>
 
+      {/* Call view */}
+      {isInCall && (
+        <DMCall
+          conversationId={conversationId}
+          profileName={currentProfile.name}
+          otherProfileName={otherProfile.name}
+          isVideo={isVideoCall}
+          onDisconnect={() => setIsInCall(false)}
+        />
+      )}
+
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4">
+      {!isInCall && (
+        <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
           {/* Welcome message */}
           <div className="text-center py-8">
@@ -169,11 +217,21 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
           <div ref={scrollRef} />
         </div>
       </ScrollArea>
+      )}
 
       {/* Input */}
-      <form onSubmit={sendMessage} className="p-4">
+      {!isInCall && (
+        <form onSubmit={sendMessage} className="p-4">
         <div className="flex items-center gap-2 px-4 py-2 bg-[#383a40] rounded-lg">
-          <button type="button" className="text-zinc-400 hover:text-white transition">
+          <button 
+            type="button" 
+            onClick={() => onOpen("messageFile", {
+              apiUrl: `/api/dm/${conversationId}/messages`,
+              query: {}
+            })}
+            className="text-zinc-400 hover:text-white transition"
+            title="Прикрепить файл"
+          >
             <Plus className="h-6 w-6" />
           </button>
           
@@ -183,9 +241,21 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
             placeholder={`Написать ${otherProfile.name}`}
             className="flex-1 bg-transparent border-0 focus-visible:ring-0 text-white placeholder:text-zinc-500"
             disabled={isLoading}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                if (newMessage.trim()) {
+                  sendMessage(e as unknown as React.FormEvent);
+                }
+              }
+            }}
           />
           
-          <button type="button" className="text-zinc-400 hover:text-white transition">
+          <button 
+            type="button" 
+            className="text-zinc-400 hover:text-white transition"
+            title="Эмодзи (скоро)"
+          >
             <Smile className="h-6 w-6" />
           </button>
           
@@ -193,13 +263,14 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
             <button
               type="submit"
               disabled={isLoading}
-              className="text-indigo-500 hover:text-indigo-400 transition"
+              className="text-primary hover:text-primary/80 transition"
             >
               <SendHorizontal className="h-6 w-6" />
             </button>
           )}
         </div>
       </form>
+      )}
     </div>
   );
 }

@@ -199,13 +199,13 @@ export function ChatItem({
               href={fileUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="relative aspect-square rounded-md mt-2 overflow-hidden border flex items-center bg-secondary h-48 w-48"
+              className="relative rounded-md mt-2 overflow-hidden border flex items-center bg-secondary max-w-sm"
             >
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={fileUrl}
-                alt={content}
-                fill
-                className="object-cover"
+                alt={content || "Изображение"}
+                className="max-h-80 w-auto object-contain rounded"
               />
             </a>
           )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Music, Play, Pause, SkipForward, SkipBack, Volume2, Repeat, Shuffle, Plus, X, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,10 +54,13 @@ export function MusicPanel({ serverId, voiceChannelId, onClose }: MusicPanelProp
   const [isLoading, setIsLoading] = useState(false);
   const [session, setSession] = useState<MusicSession | null>(null);
   const [queue, setQueue] = useState<QueueItem[]>([]);
+  const [isSeeking, setIsSeeking] = useState(false);
+  const seekTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     initSession();
-    const interval = setInterval(fetchSessionState, 3000);
+    // Faster polling for smoother UI (1 second instead of 3)
+    const interval = setInterval(fetchSessionState, 1000);
     return () => clearInterval(interval);
   }, [serverId, voiceChannelId]);
 
@@ -88,22 +91,38 @@ export function MusicPanel({ serverId, voiceChannelId, onClose }: MusicPanelProp
   };
 
   const fetchSessionState = async () => {
-    if (!session) return;
+    if (!session || isSeeking) return; // Don't update while user is seeking
 
     try {
       const res = await fetch(`/api/music/session/${session.id}/state`);
       if (res.ok) {
         const data = await res.json();
-        setSession({
-          id: data.id,
-          state: data.state,
-          currentTrack: data.currentTrack,
-          volume: data.volume,
-          loopMode: data.loopMode,
-          shuffle: data.shuffle,
-          currentPositionMs: data.currentPositionMs || 0,
-        });
-        setQueue(data.queue || []);
+        
+        // Only update if something actually changed
+        const hasChanges = 
+          session.state !== data.state ||
+          session.currentTrack?.id !== data.currentTrack?.id ||
+          session.volume !== data.volume ||
+          session.loopMode !== data.loopMode ||
+          session.shuffle !== data.shuffle ||
+          Math.abs(session.currentPositionMs - (data.currentPositionMs || 0)) > 2000; // Update if drift > 2s
+
+        if (hasChanges || data.state === "PLAYING") {
+          setSession({
+            id: data.id,
+            state: data.state,
+            currentTrack: data.currentTrack,
+            volume: data.volume,
+            loopMode: data.loopMode,
+            shuffle: data.shuffle,
+            currentPositionMs: data.currentPositionMs || 0,
+          });
+        }
+        
+        // Always update queue if it changed
+        if (JSON.stringify(queue) !== JSON.stringify(data.queue || [])) {
+          setQueue(data.queue || []);
+        }
       }
     } catch (error) {
       console.error("Failed to fetch session state:", error);
@@ -170,11 +189,45 @@ export function MusicPanel({ serverId, voiceChannelId, onClose }: MusicPanelProp
       });
 
       if (res.ok) {
-        fetchSessionState();
+        // Immediate UI update for better responsiveness
+        if (action === "play") {
+          setSession({ ...session, state: "PLAYING" });
+        } else if (action === "pause") {
+          setSession({ ...session, state: "PAUSED" });
+        }
+        // Fetch full state after a short delay
+        setTimeout(fetchSessionState, 200);
       }
     } catch (error) {
       console.error("Control error:", error);
     }
+  };
+
+  const handleSeek = (positionMs: number) => {
+    if (!session) return;
+    
+    // Update UI immediately for smooth experience
+    setSession({ ...session, currentPositionMs: positionMs });
+    setIsSeeking(true);
+
+    // Debounce actual API call
+    if (seekTimeoutRef.current) {
+      clearTimeout(seekTimeoutRef.current);
+    }
+
+    seekTimeoutRef.current = setTimeout(() => {
+      handleControl("seek", positionMs);
+      setIsSeeking(false);
+    }, 500); // Wait 500ms after user stops dragging
+  };
+
+  const handleSkipSeconds = (seconds: number) => {
+    if (!session?.currentTrack) return;
+    const newPosition = Math.max(0, Math.min(
+      session.currentPositionMs + (seconds * 1000),
+      session.currentTrack.durationMs
+    ));
+    handleSeek(newPosition);
   };
 
   const formatTime = (ms: number) => {
@@ -266,27 +319,37 @@ export function MusicPanel({ serverId, voiceChannelId, onClose }: MusicPanelProp
             value={[session.currentPositionMs]}
             max={session.currentTrack.durationMs}
             step={1000}
-            onValueChange={([value]) => handleControl("seek", value)}
+            onValueChange={([value]) => handleSeek(value)}
             className="w-full"
           />
 
           {/* Controls */}
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-1">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => handleControl("shuffle")}
               className={cn(session.shuffle && "text-primary")}
+              title="Shuffle"
             >
               <Shuffle className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => handleControl("back")}>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => handleSkipSeconds(-10)}
+              title="Назад 10 сек"
+            >
+              -10s
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => handleControl("back")} title="Previous">
               <SkipBack className="w-4 h-4" />
             </Button>
             <Button
               size="icon"
               onClick={() => handleControl(session.state === "PLAYING" ? "pause" : "play")}
               className="bg-primary hover:bg-primary/90"
+              title={session.state === "PLAYING" ? "Pause" : "Play"}
             >
               {session.state === "PLAYING" ? (
                 <Pause className="w-4 h-4" />
@@ -294,8 +357,16 @@ export function MusicPanel({ serverId, voiceChannelId, onClose }: MusicPanelProp
                 <Play className="w-4 h-4 ml-0.5" />
               )}
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => handleControl("skip")}>
+            <Button variant="ghost" size="icon" onClick={() => handleControl("skip")} title="Next">
               <SkipForward className="w-4 h-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => handleSkipSeconds(10)}
+              title="Вперед 10 сек"
+            >
+              +10s
             </Button>
             <Button
               variant="ghost"

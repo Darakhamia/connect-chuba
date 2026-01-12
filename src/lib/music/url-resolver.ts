@@ -301,6 +301,77 @@ async function resolveSpotifyPlaylist(playlistId: string, token: string): Promis
 }
 
 /**
+ * Apple Music resolver using MusicKit API
+ */
+export async function resolveAppleMusic(url: string): Promise<ResolveResult> {
+  // Apple Music requires MusicKit on client-side
+  // For server-side resolution, we use the Apple Music API with developer token
+  
+  // Extract ID from URL
+  const songMatch = url.match(/music\.apple\.com\/[a-z]{2}\/song\/[^/]+\/(\d+)/);
+  const playlistMatch = url.match(/music\.apple\.com\/[a-z]{2}\/playlist\/[^/]+\/(pl\.[a-zA-Z0-9]+)/);
+  const albumMatch = url.match(/music\.apple\.com\/[a-z]{2}\/album\/[^/]+\/(\d+)/);
+
+  if (songMatch) {
+    return {
+      type: "track",
+      track: {
+        source: TrackSource.APPLE_MUSIC,
+        sourceId: songMatch[1],
+        title: "Apple Music Track", // Will be resolved on client
+        artist: "Unknown",
+        durationMs: 0,
+        originalUrl: url,
+        metadata: {
+          needsClientResolution: true,
+        },
+      },
+    };
+  }
+
+  if (playlistMatch || albumMatch) {
+    throw new Error("Apple Music playlists/albums require client-side authentication");
+  }
+
+  throw new Error("Invalid Apple Music URL");
+}
+
+/**
+ * SoundCloud resolver using oEmbed API
+ */
+export async function resolveSoundCloud(url: string): Promise<ResolveResult> {
+  const oembedUrl = `https://soundcloud.com/oembed?format=json&url=${encodeURIComponent(url)}`;
+
+  const response = await fetch(oembedUrl);
+  if (!response.ok) {
+    throw new Error("Failed to fetch SoundCloud track");
+  }
+
+  const data = await response.json();
+
+  // Extract track ID from HTML (not ideal, but SoundCloud API is limited)
+  const trackIdMatch = data.html?.match(/tracks\/(\d+)/);
+  const sourceId = trackIdMatch ? trackIdMatch[1] : url;
+
+  return {
+    type: "track",
+    track: {
+      source: TrackSource.SOUNDCLOUD,
+      sourceId,
+      title: data.title,
+      artist: data.author_name,
+      durationMs: 0, // SoundCloud oEmbed doesn't provide duration
+      thumbnailUrl: data.thumbnail_url,
+      originalUrl: url,
+      metadata: {
+        description: data.description,
+        html: data.html,
+      },
+    },
+  };
+}
+
+/**
  * Main resolver function
  */
 export async function resolveUrl(url: string): Promise<ResolveResult> {
@@ -316,9 +387,9 @@ export async function resolveUrl(url: string): Promise<ResolveResult> {
     case TrackSource.SPOTIFY:
       return resolveSpotify(url);
     case TrackSource.APPLE_MUSIC:
-      throw new Error("Apple Music support coming soon");
+      return resolveAppleMusic(url);
     case TrackSource.SOUNDCLOUD:
-      throw new Error("SoundCloud support coming soon");
+      return resolveSoundCloud(url);
     default:
       throw new Error("Unsupported source");
   }

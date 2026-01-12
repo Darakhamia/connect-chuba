@@ -1,9 +1,12 @@
 "use client";
 
 import { useTheme } from "@/components/providers/theme-provider";
+import { useSettings } from "@/hooks/use-settings-store";
 import { cn } from "@/lib/utils";
 import { Sun, Moon, Monitor, Check } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
 const themes = [
   { id: "light" as const, label: "Светлая", icon: Sun, preview: "bg-white" },
@@ -24,6 +27,43 @@ const accentColors = [
 
 export function AppearanceSettings() {
   const { theme, setTheme } = useTheme();
+  const { 
+    accentColor, 
+    setAccentColor, 
+    fontSize, 
+    setFontSize,
+    messageDisplay,
+    setMessageDisplay
+  } = useSettings();
+
+  // Apply accent color to CSS variables
+  useEffect(() => {
+    const color = accentColors.find(c => c.id === accentColor);
+    if (color) {
+      document.documentElement.style.setProperty('--accent-color', color.color);
+    }
+  }, [accentColor]);
+
+  const handleThemeChange = (newTheme: "light" | "dark" | "system") => {
+    setTheme(newTheme);
+    toast.success(`Тема изменена на "${themes.find(t => t.id === newTheme)?.label}"`);
+  };
+
+  const handleAccentChange = (colorId: string) => {
+    setAccentColor(colorId);
+    const color = accentColors.find(c => c.id === colorId);
+    toast.success(`Акцентный цвет: ${color?.label}`);
+  };
+
+  const handleFontSizeChange = (size: number) => {
+    setFontSize(size);
+    document.documentElement.style.setProperty('--chat-font-size', `${size}px`);
+  };
+
+  const handleMessageDisplayChange = (display: "compact" | "cozy") => {
+    setMessageDisplay(display);
+    toast.success(display === "compact" ? "Компактный режим" : "Удобный режим");
+  };
 
   return (
     <div className="space-y-8">
@@ -42,7 +82,7 @@ export function AppearanceSettings() {
             return (
               <button
                 key={t.id}
-                onClick={() => setTheme(t.id)}
+                onClick={() => handleThemeChange(t.id)}
                 className={cn(
                   "relative p-4 rounded-lg border-2 transition-all",
                   isActive
@@ -81,25 +121,27 @@ export function AppearanceSettings() {
           {accentColors.map((color) => (
             <button
               key={color.id}
+              onClick={() => handleAccentChange(color.id)}
               className="group relative"
               title={color.label}
             >
               <div
-                className="w-10 h-10 rounded-full ring-2 ring-transparent group-hover:ring-white/30 transition-all"
+                className={cn(
+                  "w-10 h-10 rounded-full ring-2 transition-all",
+                  accentColor === color.id 
+                    ? "ring-white ring-offset-2 ring-offset-zinc-900" 
+                    : "ring-transparent group-hover:ring-white/30"
+                )}
                 style={{ backgroundColor: color.color }}
               />
-              {color.id === "indigo" && (
+              {accentColor === color.id && (
                 <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-white flex items-center justify-center">
-                  <Check className="w-3 h-3 text-indigo-500" />
+                  <Check className="w-3 h-3" style={{ color: color.color }} />
                 </div>
               )}
             </button>
           ))}
         </div>
-        
-        <p className="text-xs text-zinc-500">
-          Кастомные цвета скоро будут доступны
-        </p>
       </div>
 
       <div className="h-[1px] bg-zinc-700" />
@@ -108,7 +150,7 @@ export function AppearanceSettings() {
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold text-white mb-1">Размер текста</h3>
-          <p className="text-sm text-zinc-400">Настройте размер текста в чате</p>
+          <p className="text-sm text-zinc-400">Настройте размер текста в чате ({fontSize}px)</p>
         </div>
 
         <div className="flex items-center gap-4">
@@ -117,10 +159,19 @@ export function AppearanceSettings() {
             type="range"
             min="12"
             max="20"
-            defaultValue="14"
+            value={fontSize}
+            onChange={(e) => handleFontSizeChange(Number(e.target.value))}
             className="flex-1 h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-indigo-500"
           />
           <Label className="text-zinc-400 text-lg">A</Label>
+        </div>
+
+        {/* Preview */}
+        <div className="p-4 bg-zinc-800 rounded-lg">
+          <p className="text-zinc-400 text-xs mb-2">Предпросмотр:</p>
+          <p className="text-white" style={{ fontSize: `${fontSize}px` }}>
+            Привет! Это пример сообщения в чате.
+          </p>
         </div>
       </div>
 
@@ -134,7 +185,15 @@ export function AppearanceSettings() {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <button className="p-4 rounded-lg border-2 border-indigo-500 bg-zinc-800">
+          <button 
+            onClick={() => handleMessageDisplayChange("compact")}
+            className={cn(
+              "p-4 rounded-lg border-2 transition-all",
+              messageDisplay === "compact"
+                ? "border-indigo-500 bg-zinc-800"
+                : "border-zinc-700 bg-zinc-800/50 hover:border-zinc-600"
+            )}
+          >
             <div className="space-y-2 mb-3">
               <div className="flex items-start gap-2">
                 <div className="w-8 h-8 rounded-full bg-zinc-600" />
@@ -147,7 +206,15 @@ export function AppearanceSettings() {
             <span className="text-sm text-white">Компактный</span>
           </button>
           
-          <button className="p-4 rounded-lg border-2 border-zinc-700 bg-zinc-800/50 hover:border-zinc-600">
+          <button 
+            onClick={() => handleMessageDisplayChange("cozy")}
+            className={cn(
+              "p-4 rounded-lg border-2 transition-all",
+              messageDisplay === "cozy"
+                ? "border-indigo-500 bg-zinc-800"
+                : "border-zinc-700 bg-zinc-800/50 hover:border-zinc-600"
+            )}
+          >
             <div className="space-y-2 mb-3">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full bg-zinc-600" />

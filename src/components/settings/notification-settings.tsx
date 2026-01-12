@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { Bell, MessageCircle, AtSign, Volume2 } from "lucide-react";
-import { Label } from "@/components/ui/label";
+import { useSettings } from "@/hooks/use-settings-store";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface ToggleSwitchProps {
   enabled: boolean;
@@ -30,19 +30,55 @@ function ToggleSwitch({ enabled, onChange }: ToggleSwitchProps) {
 }
 
 export function NotificationSettings() {
-  const [desktopNotifications, setDesktopNotifications] = useState(true);
-  const [soundNotifications, setSoundNotifications] = useState(true);
-  const [mentionNotifications, setMentionNotifications] = useState(true);
-  const [dmNotifications, setDmNotifications] = useState(true);
-  const [serverNotifications, setServerNotifications] = useState(false);
+  const {
+    desktopNotifications,
+    soundNotifications,
+    mentionNotifications,
+    dmNotifications,
+    serverNotifications,
+    notificationSounds,
+    setDesktopNotifications,
+    setSoundNotifications,
+    setMentionNotifications,
+    setDmNotifications,
+    setServerNotifications,
+    setNotificationSound,
+  } = useSettings();
 
   const requestNotificationPermission = async () => {
     if ("Notification" in window) {
       const permission = await Notification.requestPermission();
       if (permission === "granted") {
         setDesktopNotifications(true);
+        toast.success("Уведомления включены!");
+        
+        // Show test notification
+        new Notification("ECHO", {
+          body: "Уведомления работают!",
+          icon: "/favicon.ico",
+        });
+      } else {
+        toast.error("Уведомления заблокированы браузером");
       }
     }
+  };
+
+  const handleDesktopNotificationsChange = async (enabled: boolean) => {
+    if (enabled) {
+      await requestNotificationPermission();
+    } else {
+      setDesktopNotifications(false);
+      toast.success("Уведомления отключены");
+    }
+  };
+
+  const soundLabels: Record<keyof typeof notificationSounds, string> = {
+    message: "Новое сообщение",
+    mention: "Упоминание",
+    join: "Пользователь вошёл",
+    leave: "Пользователь вышел",
+    call: "Входящий звонок",
+    deafen: "Выкл. звук",
   };
 
   return (
@@ -62,13 +98,7 @@ export function NotificationSettings() {
             </div>
             <ToggleSwitch
               enabled={desktopNotifications}
-              onChange={(enabled) => {
-                if (enabled) {
-                  requestNotificationPermission();
-                } else {
-                  setDesktopNotifications(false);
-                }
-              }}
+              onChange={handleDesktopNotificationsChange}
             />
           </div>
 
@@ -82,7 +112,10 @@ export function NotificationSettings() {
             </div>
             <ToggleSwitch
               enabled={soundNotifications}
-              onChange={setSoundNotifications}
+              onChange={(enabled) => {
+                setSoundNotifications(enabled);
+                toast.success(enabled ? "Звук включён" : "Звук отключён");
+              }}
             />
           </div>
         </div>
@@ -143,20 +176,16 @@ export function NotificationSettings() {
         <h3 className="text-lg font-semibold text-white">Звуки</h3>
 
         <div className="grid grid-cols-2 gap-3">
-          {[
-            { id: "message", label: "Новое сообщение" },
-            { id: "mention", label: "Упоминание" },
-            { id: "join", label: "Пользователь вошёл" },
-            { id: "leave", label: "Пользователь вышел" },
-            { id: "call", label: "Входящий звонок" },
-            { id: "deafen", label: "Выкл. звук" },
-          ].map((sound) => (
+          {(Object.keys(notificationSounds) as Array<keyof typeof notificationSounds>).map((sound) => (
             <div
-              key={sound.id}
+              key={sound}
               className="flex items-center justify-between p-3 rounded-lg bg-zinc-800/50"
             >
-              <span className="text-sm text-white">{sound.label}</span>
-              <ToggleSwitch enabled={true} onChange={() => {}} />
+              <span className="text-sm text-white">{soundLabels[sound]}</span>
+              <ToggleSwitch 
+                enabled={notificationSounds[sound]} 
+                onChange={(enabled) => setNotificationSound(sound, enabled)} 
+              />
             </div>
           ))}
         </div>

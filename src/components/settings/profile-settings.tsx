@@ -2,39 +2,75 @@
 
 import { useState } from "react";
 import { Profile } from "@prisma/client";
-import { Camera, Save, Check, Copy } from "lucide-react";
+import { Camera, Save, Check, Copy, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface ProfileSettingsProps {
   profile: Profile;
 }
 
 export function ProfileSettings({ profile }: ProfileSettingsProps) {
+  const router = useRouter();
   const [name, setName] = useState(profile.name);
   const [bio, setBio] = useState(profile.bio || "");
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
   const handleCopyId = () => {
     navigator.clipboard.writeText(profile.id);
     setCopied(true);
+    toast.success("ID скопирован!");
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleNameChange = (value: string) => {
+    setName(value);
+    setHasChanges(value !== profile.name || bio !== (profile.bio || ""));
+  };
+
+  const handleBioChange = (value: string) => {
+    setBio(value);
+    setHasChanges(name !== profile.name || value !== (profile.bio || ""));
+  };
+
   const handleSave = async () => {
+    if (!hasChanges) return;
+    
+    if (name.length < 2) {
+      toast.error("Имя должно быть минимум 2 символа");
+      return;
+    }
+    
+    if (name.length > 32) {
+      toast.error("Имя должно быть максимум 32 символа");
+      return;
+    }
+
     try {
       setIsLoading(true);
-      // TODO: Implement profile update API
-      await fetch("/api/profile", {
+      const res = await fetch("/api/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, bio }),
       });
+
+      if (res.ok) {
+        toast.success("Профиль сохранён!");
+        setHasChanges(false);
+        router.refresh();
+      } else {
+        const text = await res.text();
+        toast.error(text || "Ошибка сохранения");
+      }
     } catch (error) {
       console.error(error);
+      toast.error("Не удалось сохранить профиль");
     } finally {
       setIsLoading(false);
     }
@@ -74,10 +110,12 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
           <Input
             id="name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => handleNameChange(e.target.value)}
             className="bg-zinc-900 border-zinc-700 text-white"
             placeholder="Ваше имя"
+            maxLength={32}
           />
+          <p className="text-xs text-zinc-500">{name.length}/32</p>
         </div>
 
         <div className="space-y-2">
@@ -85,10 +123,12 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
           <textarea
             id="bio"
             value={bio}
-            onChange={(e) => setBio(e.target.value)}
+            onChange={(e) => handleBioChange(e.target.value)}
             className="w-full h-24 px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-md text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
             placeholder="Расскажите немного о себе..."
+            maxLength={190}
           />
+          <p className="text-xs text-zinc-500">{bio.length}/190</p>
         </div>
 
         <div className="space-y-2">
@@ -142,11 +182,15 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
       <div className="flex justify-end">
         <Button 
           onClick={handleSave} 
-          disabled={isLoading}
-          className="bg-indigo-500 hover:bg-indigo-600"
+          disabled={isLoading || !hasChanges}
+          className="bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50"
         >
-          <Save className="w-4 h-4 mr-2" />
-          Сохранить изменения
+          {isLoading ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Save className="w-4 h-4 mr-2" />
+          )}
+          {isLoading ? "Сохранение..." : "Сохранить изменения"}
         </Button>
       </div>
     </div>

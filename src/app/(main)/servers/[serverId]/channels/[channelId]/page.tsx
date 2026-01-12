@@ -52,6 +52,7 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
       <ChatHeader
         name={channel.name}
         serverId={serverId}
+        channelId={channel.id}
         type="channel"
       />
       

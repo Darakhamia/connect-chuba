@@ -3,10 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Member, MemberRole } from "@prisma/client";
-import { Edit, FileIcon, ShieldAlert, ShieldCheck, Trash } from "lucide-react";
+import { Edit, FileIcon, ShieldAlert, ShieldCheck, Trash, Smile, Pin } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useRouter } from "next/navigation";
 import qs from "query-string";
 
 import { cn } from "@/lib/utils";
@@ -57,8 +58,10 @@ export function ChatItem({
   socketUrl,
   socketQuery,
 }: ChatItemProps) {
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [, setIsDeleting] = useState(false);
+  const [showReactionPicker, setShowReactionPicker] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -102,10 +105,50 @@ export function ChatItem({
       await fetch(url, {
         method: "DELETE",
       });
+      router.refresh();
     } catch (error) {
       console.log(error);
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const onReaction = async (emoji: string) => {
+    try {
+      const url = qs.stringifyUrl({
+        url: `${socketUrl}/${id}/reactions`,
+        query: socketQuery,
+      });
+
+      await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ emoji }),
+      });
+      
+      setShowReactionPicker(false);
+      router.refresh();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onPin = async () => {
+    try {
+      const url = qs.stringifyUrl({
+        url: `${socketUrl}/${id}/pin`,
+        query: socketQuery,
+      });
+
+      await fetch(url, {
+        method: "PATCH",
+      });
+      
+      router.refresh();
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -237,8 +280,56 @@ export function ChatItem({
       </div>
 
       {/* Кнопки действий */}
-      {canDeleteMessage && (
+      {!deleted && (
         <div className="hidden group-hover:flex items-center gap-x-2 absolute p-1 -top-2 right-5 bg-white dark:bg-zinc-800 border rounded-sm">
+          {/* Реакции */}
+          <TooltipProvider>
+            <Tooltip delayDuration={50}>
+              <TooltipTrigger>
+                <div className="relative">
+                  <Smile
+                    onClick={() => setShowReactionPicker(!showReactionPicker)}
+                    className="cursor-pointer w-4 h-4 text-muted-foreground hover:text-foreground transition"
+                  />
+                  {showReactionPicker && (
+                    <div className="absolute top-6 right-0 bg-white dark:bg-zinc-800 border rounded-md p-2 flex gap-1 z-50">
+                      {["👍", "❤️", "😂", "😮", "😢", "🔥", "✨", "🎉"].map((emoji) => (
+                        <button
+                          key={emoji}
+                          onClick={() => onReaction(emoji)}
+                          className="text-xl hover:scale-125 transition"
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Реакция</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          {/* Закрепить (только для модераторов/админов) */}
+          {(currentMember.role === MemberRole.ADMIN || currentMember.role === MemberRole.MODERATOR) && (
+            <TooltipProvider>
+              <Tooltip delayDuration={50}>
+                <TooltipTrigger>
+                  <Pin
+                    onClick={onPin}
+                    className="cursor-pointer w-4 h-4 text-muted-foreground hover:text-foreground transition"
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Закрепить</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+
+          {/* Редактировать */}
           {canEditMessage && (
             <TooltipProvider>
               <Tooltip delayDuration={50}>
@@ -254,19 +345,23 @@ export function ChatItem({
               </Tooltip>
             </TooltipProvider>
           )}
-          <TooltipProvider>
-            <Tooltip delayDuration={50}>
-              <TooltipTrigger>
-                <Trash
-                  onClick={onDelete}
-                  className="cursor-pointer ml-auto w-4 h-4 text-muted-foreground hover:text-rose-500 transition"
-                />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Удалить</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+
+          {/* Удалить */}
+          {canDeleteMessage && (
+            <TooltipProvider>
+              <Tooltip delayDuration={50}>
+                <TooltipTrigger>
+                  <Trash
+                    onClick={onDelete}
+                    className="cursor-pointer ml-auto w-4 h-4 text-muted-foreground hover:text-rose-500 transition"
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Удалить</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
       )}
     </div>

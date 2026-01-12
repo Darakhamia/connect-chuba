@@ -25,13 +25,19 @@ export function DeleteServerModal() {
     try {
       setIsLoading(true);
 
-      await fetch(`/api/servers/${server?.id}`, {
+      const response = await fetch(`/api/servers/${server?.id}`, {
         method: "DELETE",
       });
 
+      if (!response.ok) {
+        throw new Error("Failed to delete server");
+      }
+
       onClose();
-      router.refresh();
       router.push("/");
+      router.refresh();
+      // Force reload to update navigation sidebar
+      window.location.href = "/";
     } catch (error) {
       console.error(error);
     } finally {

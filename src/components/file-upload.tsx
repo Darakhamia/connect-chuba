@@ -64,10 +64,11 @@ export function FileUpload({ endpoint, value, onChange }: FileUploadProps) {
     <UploadDropzone<OurFileRouter, typeof endpoint>
       endpoint={endpoint}
       onClientUploadComplete={(res) => {
-        onChange(res?.[0]?.ufsUrl);
+        onChange(res?.[0]?.url);
       }}
       onUploadError={(error: Error) => {
         console.error("Upload error:", error);
+        alert(`Ошибка загрузки: ${error.message}`);
       }}
       appearance={{
         container: "border-dashed border-2 border-muted-foreground/25 rounded-lg",

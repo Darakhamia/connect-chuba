@@ -23,9 +23,16 @@ export function SoundCloudPlayer({
   onError,
 }: SoundCloudPlayerProps) {
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
-  const [isWidgetReady, setIsWidgetReady] = useState(false);
   const widgetRef = useRef<any>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  
+  // Store widget in window for global access from controller
+  useEffect(() => {
+    if (widgetRef.current) {
+      (window as any).__soundCloudWidget = widgetRef.current;
+      console.log("🌐 Stored widget in window.__soundCloudWidget");
+    }
+  }, [widgetRef.current]);
 
   // Load SoundCloud Widget API script
   const handleScriptLoad = () => {
@@ -57,7 +64,7 @@ export function SoundCloudPlayer({
         // Bind events
         widgetRef.current.bind(window.SC.Widget.Events.READY, () => {
           console.log("✅ SoundCloud widget ready!");
-          setIsWidgetReady(true);
+          (window as any).__soundCloudWidget = widgetRef.current;
           
           // Get current track info for debugging
           widgetRef.current.getCurrentSound((sound: any) => {
@@ -158,64 +165,53 @@ export function SoundCloudPlayer({
 
 /**
  * Create controller for SoundCloud player
+ * Uses window.__soundCloudWidget for global access
  */
-export function createSoundCloudController(widgetRef: React.RefObject<any>) {
-  const waitForWidget = (maxAttempts = 20): Promise<boolean> => {
-    return new Promise((resolve) => {
-      let attempts = 0;
-      const checkWidget = () => {
-        if (widgetRef.current) {
-          resolve(true);
-        } else if (attempts < maxAttempts) {
-          attempts++;
-          setTimeout(checkWidget, 100); // Check every 100ms
-        } else {
-          console.error("SoundCloud widget timeout - not ready after 2 seconds");
-          resolve(false);
-        }
-      };
-      checkWidget();
-    });
+export function createSoundCloudController(widgetRef?: React.RefObject<any>) {
+  const getWidget = () => {
+    return (window as any).__soundCloudWidget || widgetRef?.current;
   };
 
   return {
-    play: async () => {
+    play: () => {
       console.log("🎵 SoundCloud controller: play()");
-      const ready = await waitForWidget();
-      if (ready && widgetRef.current) {
-        widgetRef.current.play();
+      const widget = getWidget();
+      if (widget) {
+        widget.play();
         console.log("▶️ SoundCloud play command sent");
       } else {
-        console.error("❌ SoundCloud widget not ready for play()");
+        console.error("❌ SoundCloud widget not available");
       }
     },
     pause: () => {
       console.log("⏸️ SoundCloud controller: pause()");
-      if (widgetRef.current) {
-        widgetRef.current.pause();
+      const widget = getWidget();
+      if (widget) {
+        widget.pause();
       }
     },
-    seekTo: async (seconds: number) => {
+    seekTo: (seconds: number) => {
       console.log("⏩ SoundCloud controller: seekTo", seconds);
-      const ready = await waitForWidget();
-      if (ready && widgetRef.current) {
-        widgetRef.current.seekTo(seconds * 1000); // SoundCloud uses milliseconds
+      const widget = getWidget();
+      if (widget) {
+        widget.seekTo(seconds * 1000); // SoundCloud uses milliseconds
       }
     },
     getCurrentTime: (callback: (time: number) => void) => {
-      if (!widgetRef.current) {
+      const widget = getWidget();
+      if (!widget) {
         callback(0);
         return;
       }
-      widgetRef.current.getPosition((position: number) => {
+      widget.getPosition((position: number) => {
         callback(position / 1000); // Convert ms to seconds
       });
     },
-    setVolume: async (volume: number) => {
+    setVolume: (volume: number) => {
       console.log("🔊 SoundCloud controller: setVolume", volume);
-      const ready = await waitForWidget();
-      if (ready && widgetRef.current) {
-        widgetRef.current.setVolume(volume);
+      const widget = getWidget();
+      if (widget) {
+        widget.setVolume(volume);
       }
     },
   };

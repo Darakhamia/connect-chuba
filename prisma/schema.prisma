@@ -84,6 +84,33 @@ model Server {
   imageUrl   String   @db.Text
   inviteCode String   @unique
   
+  // Server Settings
+  description        String?  @db.Text
+  bannerUrl          String?  @db.Text
+  region             String?  @default("auto")
+  verificationLevel  Int      @default(0) // 0-4 (None, Low, Medium, High, Highest)
+  explicitContentFilter Int   @default(0) // 0-2 (Disabled, Members without roles, All members)
+  defaultNotifications  Int   @default(0) // 0-1 (All messages, Only mentions)
+  afkChannelId       String?
+  afkTimeout         Int      @default(300) // seconds
+  systemChannelId    String?
+  vanityUrl          String?  @unique
+  premiumTier        Int      @default(0) // 0-3 (None, Tier 1, Tier 2, Tier 3)
+  premiumSubscriptionCount Int @default(0)
+  preferredLocale    String   @default("ru-RU")
+  
+  // Moderation Settings
+  autoModEnabled     Boolean  @default(false)
+  filterWords        String[] // Array of banned words
+  antiSpamEnabled    Boolean  @default(false)
+  antiRaidEnabled    Boolean  @default(false)
+  
+  // Feature Flags
+  welcomeChannelId   String?
+  rulesChannelId     String?
+  communityEnabled   Boolean  @default(false)
+  discoverableEnabled Boolean @default(false)
+  
   // Owner relation
   profileId  String
   profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
@@ -93,11 +120,13 @@ model Server {
   categories Category[]
   channels   Channel[]
   musicSessions MusicSession[]
+  auditLogs  AuditLog[]
   
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   @@index([profileId])
+  @@index([vanityUrl])
   @@map("servers")
 }
 
@@ -546,4 +575,25 @@ model MusicPermission {
   @@index([sessionId])
   @@index([profileId])
   @@map("music_permissions")
+}
+
+// AuditLog - Server action logging
+model AuditLog {
+  id         String   @id @default(uuid())
+  serverId   String
+  userId     String   // Who performed the action
+  action     String   // e.g., "CHANNEL_CREATE", "MEMBER_BAN", "MESSAGE_DELETE"
+  targetType String?  // e.g., "CHANNEL", "MEMBER", "MESSAGE"
+  targetId   String?  // ID of the affected entity
+  changes    Json?    // Old and new values
+  reason     String?  @db.Text
+  
+  // Relations
+  server     Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  
+  createdAt  DateTime @default(now())
+
+  @@index([serverId])
+  @@index([userId])
+  @@map("audit_logs")
 }

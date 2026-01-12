@@ -52,10 +52,20 @@ export function ServerHeader({ server, role }: ServerHeaderProps) {
         
         {isAdmin && (
           <DropdownMenuItem
-            onClick={() => onOpen("editServer", { server })}
+            onClick={() => onOpen("serverSettings", { server })}
             className="px-3 py-2 text-sm cursor-pointer"
           >
             Настройки сервера
+            <Settings className="h-4 w-4 ml-auto" />
+          </DropdownMenuItem>
+        )}
+        
+        {isAdmin && (
+          <DropdownMenuItem
+            onClick={() => onOpen("editServer", { server })}
+            className="px-3 py-2 text-sm cursor-pointer"
+          >
+            Изменить название
             <Settings className="h-4 w-4 ml-auto" />
           </DropdownMenuItem>
         )}

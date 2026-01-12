@@ -65,6 +65,12 @@ model Profile {
   dmConversationsTwo DMConversation[] @relation("DMProfileTwo")
   dmMessagesSent     DMMessage[]
   
+  // Music relations
+  musicSessionsCreated MusicSession[] @relation("MusicSessionCreator")
+  tracksUploaded       Track[]
+  queueItemsAdded      QueueItem[]
+  musicPermissions     MusicPermission[]
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -86,6 +92,7 @@ model Server {
   members    Member[]
   categories Category[]
   channels   Channel[]
+  musicSessions MusicSession[]
   
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -168,6 +175,7 @@ model Channel {
   
   // Relations
   messages Message[]
+  musicSessions MusicSession[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -411,4 +419,131 @@ model DMMessageReaction {
   @@index([messageId])
   @@index([memberId])
   @@map("dm_message_reactions")
+}
+
+// ========================================
+// MUSIC SYSTEM MODELS
+// ========================================
+
+enum MusicSessionState {
+  IDLE
+  PLAYING
+  PAUSED
+  LOADING
+}
+
+enum LoopMode {
+  OFF
+  ONE
+  ALL
+}
+
+enum TrackSource {
+  YOUTUBE
+  SPOTIFY
+  APPLE_MUSIC
+  SOUNDCLOUD
+  UPLOADED
+}
+
+// MusicSession - Music playback session tied to a voice channel
+model MusicSession {
+  id              String            @id @default(uuid())
+  serverId        String
+  voiceChannelId  String
+  createdById     String
+  state           MusicSessionState @default(IDLE)
+  currentTrackId  String?
+  startedAt       DateTime?
+  offsetMs        Int               @default(0)
+  loopMode        LoopMode          @default(OFF)
+  shuffle         Boolean           @default(false)
+  volume          Int               @default(100)
+  djMode          Boolean           @default(false)
+  
+  // Relations
+  server          Server            @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  channel         Channel           @relation(fields: [voiceChannelId], references: [id], onDelete: Cascade)
+  createdBy       Profile           @relation("MusicSessionCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  currentTrack    Track?            @relation("CurrentTrack", fields: [currentTrackId], references: [id], onDelete: SetNull)
+  queue           QueueItem[]
+  permissions     MusicPermission[]
+  
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([serverId, voiceChannelId])
+  @@index([serverId])
+  @@index([voiceChannelId])
+  @@index([createdById])
+  @@map("music_sessions")
+}
+
+// Track - Cached music track metadata
+model Track {
+  id              String      @id @default(uuid())
+  source          TrackSource
+  sourceId        String      // YouTube video ID, Spotify URI, etc.
+  title           String
+  artist          String?
+  durationMs      Int
+  thumbnailUrl    String?     @db.Text
+  originalUrl     String      @db.Text
+  metadata        Json?       // Extra metadata (genre, album, etc.)
+  
+  // For uploaded files
+  uploadedFileUrl String?     @db.Text
+  uploadedById    String?
+  uploadedBy      Profile?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  
+  // Relations
+  sessionsAsCurrent MusicSession[] @relation("CurrentTrack")
+  queueItems        QueueItem[]
+  
+  createdAt       DateTime    @default(now())
+  
+  @@unique([source, sourceId])
+  @@index([source])
+  @@index([uploadedById])
+  @@map("tracks")
+}
+
+// QueueItem - Track in a music session queue
+model QueueItem {
+  id         String       @id @default(uuid())
+  sessionId  String
+  trackId    String
+  addedById  String
+  position   Int
+  
+  // Relations
+  session    MusicSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  track      Track        @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  addedBy    Profile      @relation(fields: [addedById], references: [id], onDelete: Cascade)
+  
+  createdAt  DateTime     @default(now())
+  
+  @@index([sessionId, position])
+  @@index([trackId])
+  @@index([addedById])
+  @@map("queue_items")
+}
+
+// MusicPermission - DJ permissions for music sessions
+model MusicPermission {
+  id         String       @id @default(uuid())
+  sessionId  String
+  profileId  String
+  canControl Boolean      @default(true)
+  
+  // Relations
+  session    MusicSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  profile    Profile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  createdAt  DateTime     @default(now())
+  
+  @@unique([sessionId, profileId])
+  @@index([sessionId])
+  @@index([profileId])
+  @@map("music_permissions")
 }

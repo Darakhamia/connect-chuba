@@ -5,6 +5,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/uploadthing(.*)",
+  "/api/socket(.*)", // Socket.io endpoint
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

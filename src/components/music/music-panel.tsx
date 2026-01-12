@@ -14,10 +14,13 @@ import { MusicPlaybackManager } from "./playback/music-playback-manager";
 interface Track {
   id: string;
   source: string;
+  sourceId: string;
   title: string;
   artist?: string;
   durationMs: number;
   thumbnailUrl?: string;
+  originalUrl?: string;
+  uploadedFileUrl?: string;
 }
 
 interface QueueItem {

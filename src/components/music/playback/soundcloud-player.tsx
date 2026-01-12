@@ -35,29 +35,40 @@ export function SoundCloudPlayer({
   useEffect(() => {
     if (!isScriptLoaded || !iframeRef.current) return;
 
+    console.log("Initializing SoundCloud widget for URL:", url);
+
     try {
       widgetRef.current = window.SC.Widget(iframeRef.current);
 
       // Bind events
       widgetRef.current.bind(window.SC.Widget.Events.READY, () => {
-        console.log("SoundCloud widget ready");
+        console.log("✅ SoundCloud widget ready!");
+        
+        // Get current track info for debugging
+        widgetRef.current.getCurrentSound((sound: any) => {
+          console.log("Current SoundCloud track:", sound);
+        });
+        
         onReady?.();
       });
 
       widgetRef.current.bind(window.SC.Widget.Events.PLAY, () => {
+        console.log("▶️ SoundCloud started playing");
         onStateChange?.("playing");
       });
 
       widgetRef.current.bind(window.SC.Widget.Events.PAUSE, () => {
+        console.log("⏸️ SoundCloud paused");
         onStateChange?.("paused");
       });
 
       widgetRef.current.bind(window.SC.Widget.Events.FINISH, () => {
+        console.log("⏹️ SoundCloud finished");
         onStateChange?.("ended");
       });
 
       widgetRef.current.bind(window.SC.Widget.Events.ERROR, (error: any) => {
-        console.error("SoundCloud error:", error);
+        console.error("❌ SoundCloud error:", error);
         onError?.(error);
       });
 
@@ -126,20 +137,32 @@ export function SoundCloudPlayer({
 export function createSoundCloudController(widgetRef: React.RefObject<any>) {
   return {
     play: () => {
-      widgetRef.current?.play();
+      console.log("🎵 SoundCloud controller: play()");
+      if (widgetRef.current) {
+        widgetRef.current.play();
+      } else {
+        console.error("SoundCloud widget not initialized");
+      }
     },
     pause: () => {
+      console.log("⏸️ SoundCloud controller: pause()");
       widgetRef.current?.pause();
     },
     seekTo: (seconds: number) => {
+      console.log("⏩ SoundCloud controller: seekTo", seconds);
       widgetRef.current?.seekTo(seconds * 1000); // SoundCloud uses milliseconds
     },
     getCurrentTime: (callback: (time: number) => void) => {
-      widgetRef.current?.getPosition((position: number) => {
+      if (!widgetRef.current) {
+        callback(0);
+        return;
+      }
+      widgetRef.current.getPosition((position: number) => {
         callback(position / 1000); // Convert ms to seconds
       });
     },
     setVolume: (volume: number) => {
+      console.log("🔊 SoundCloud controller: setVolume", volume);
       widgetRef.current?.setVolume(volume);
     },
   };

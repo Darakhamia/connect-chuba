@@ -160,7 +160,7 @@ export function MusicPlaybackManager({
     }
   };
 
-  const syncPlayback = () => {
+  const syncPlayback = async () => {
     if (!currentTrack || !startedAt) return;
 
     const expectedPositionMs = calculateCurrentPosition();
@@ -176,8 +176,12 @@ export function MusicPlaybackManager({
         currentSeconds = appleMusicController.getCurrentTime();
         break;
       case TrackSource.SOUNDCLOUD:
-        soundCloudController.getCurrentTime((time) => {
-          currentSeconds = time;
+        // SoundCloud uses callback-based getCurrentTime
+        await new Promise<void>((resolve) => {
+          soundCloudController.getCurrentTime((time) => {
+            currentSeconds = time;
+            resolve();
+          });
         });
         break;
       case TrackSource.UPLOADED:

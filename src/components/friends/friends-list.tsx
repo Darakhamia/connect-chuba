@@ -163,7 +163,8 @@ export function FriendsList() {
     friend.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const onlineFriends = filteredFriends.filter((f) => f.status === "ONLINE");
+  // Пока все друзья считаются онлайн
+  const onlineFriends = filteredFriends;
 
   const tabs = [
     { id: "online" as const, label: "В сети", count: onlineFriends.length },

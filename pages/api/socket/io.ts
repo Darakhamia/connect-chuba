@@ -1,21 +1,24 @@
 import { Server as NetServer } from "http";
-import { NextRequest } from "next/server";
+import { NextApiRequest } from "next";
 import { Server as ServerIO } from "socket.io";
+import { NextApiResponseServerIO } from "@/types";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
-let io: ServerIO | undefined;
-
-export async function GET(req: NextRequest) {
-  if (!io) {
-    // @ts-ignore
-    const httpServer: NetServer = (req as any).socket?.server as NetServer;
-    io = new ServerIO(httpServer, {
-      path: "/api/socket/io",
+const ioHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
+  if (!res.socket.server.io) {
+    const path = "/api/socket/io";
+    const httpServer: NetServer = res.socket.server as any;
+    
+    const io = new ServerIO(httpServer, {
+      path: path,
       addTrailingSlash: false,
       cors: {
-        origin: process.env.NEXT_PUBLIC_SITE_URL || "*",
+        origin: "*",
         methods: ["GET", "POST"],
       },
     });
@@ -54,8 +57,8 @@ export async function GET(req: NextRequest) {
 
       // Status change
       socket.on("status_change", ({ status }: { status: string }) => {
-        // Broadcast to all friends
-        io?.emit("user_status_changed", { userId, status });
+        // Broadcast to all connected clients
+        io.emit("user_status_changed", { userId, status });
       });
 
       // Disconnect
@@ -64,10 +67,13 @@ export async function GET(req: NextRequest) {
       });
     });
 
+    res.socket.server.io = io;
     console.log("🚀 Socket.IO server initialized");
+  } else {
+    console.log("✅ Socket.IO server already running");
   }
 
-  return new Response("Socket.IO server is running", {
-    status: 200,
-  });
-}
+  res.end();
+};
+
+export default ioHandler;

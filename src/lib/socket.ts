@@ -15,7 +15,7 @@ class SocketClient {
 
     console.log("🔌 Connecting to WebSocket...");
 
-    this.socket = io(process.env.NEXT_PUBLIC_SITE_URL || "", {
+    this.socket = io({
       path: "/api/socket/io",
       addTrailingSlash: false,
       transports: ["websocket", "polling"], // Prefer WebSocket

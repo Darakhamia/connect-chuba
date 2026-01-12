@@ -7,6 +7,7 @@ import { ServerHeader } from "./server-header";
 import { ServerSection } from "./server-section";
 import { ServerChannel } from "./server-channel";
 import { ServerMember } from "./server-member";
+import { UserPanel } from "@/components/user-panel";
 
 interface ServerSidebarProps {
   serverId: string;
@@ -160,6 +161,9 @@ export async function ServerSidebar({ serverId }: ServerSidebarProps) {
           )}
         </div>
       </ScrollArea>
+      
+      {/* Панель пользователя */}
+      <UserPanel profile={profile} />
     </div>
   );
 }

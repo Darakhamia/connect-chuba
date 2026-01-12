@@ -2,11 +2,18 @@
 
 import { useState } from "react";
 import { Profile } from "@prisma/client";
-import { Camera, Save, Check, Copy, Loader2 } from "lucide-react";
+import { Camera, Save, Check, Copy, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { FileUpload } from "@/components/file-upload";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -18,9 +25,11 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
   const router = useRouter();
   const [name, setName] = useState(profile.name);
   const [bio, setBio] = useState(profile.bio || "");
+  const [imageUrl, setImageUrl] = useState(profile.imageUrl);
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
 
   const handleCopyId = () => {
     navigator.clipboard.writeText(profile.id);
@@ -29,14 +38,31 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const checkChanges = (newName: string, newBio: string, newImageUrl: string) => {
+    setHasChanges(
+      newName !== profile.name || 
+      newBio !== (profile.bio || "") ||
+      newImageUrl !== profile.imageUrl
+    );
+  };
+
   const handleNameChange = (value: string) => {
     setName(value);
-    setHasChanges(value !== profile.name || bio !== (profile.bio || ""));
+    checkChanges(value, bio, imageUrl);
   };
 
   const handleBioChange = (value: string) => {
     setBio(value);
-    setHasChanges(name !== profile.name || value !== (profile.bio || ""));
+    checkChanges(name, value, imageUrl);
+  };
+
+  const handleAvatarChange = (url?: string) => {
+    if (url) {
+      setImageUrl(url);
+      checkChanges(name, bio, url);
+      setIsAvatarDialogOpen(false);
+      toast.success("Аватар загружен! Нажмите 'Сохранить' для применения.");
+    }
   };
 
   const handleSave = async () => {
@@ -57,7 +83,7 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
       const res = await fetch("/api/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, bio }),
+        body: JSON.stringify({ name, bio, imageUrl }),
       });
 
       if (res.ok) {
@@ -82,12 +108,15 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
       <div className="flex items-start gap-6">
         <div className="relative group">
           <Avatar className="w-24 h-24">
-            <AvatarImage src={profile.imageUrl} />
+            <AvatarImage src={imageUrl} />
             <AvatarFallback className="bg-indigo-500 text-2xl text-white">
               {profile.name.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <button className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+          <button 
+            onClick={() => setIsAvatarDialogOpen(true)}
+            className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+          >
             <Camera className="w-6 h-6 text-white" />
           </button>
         </div>
@@ -95,11 +124,37 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-white mb-1">{profile.name}</h3>
           <p className="text-sm text-zinc-400 mb-3">{profile.email}</p>
-          <Button variant="outline" size="sm" className="border-zinc-600">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="border-zinc-600"
+            onClick={() => setIsAvatarDialogOpen(true)}
+          >
             Изменить аватар
           </Button>
         </div>
       </div>
+
+      {/* Avatar upload dialog */}
+      <Dialog open={isAvatarDialogOpen} onOpenChange={setIsAvatarDialogOpen}>
+        <DialogContent className="bg-zinc-900 border-zinc-700">
+          <DialogHeader>
+            <DialogTitle className="text-white">Изменить аватар</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex justify-center">
+              <FileUpload
+                endpoint="serverImage"
+                value={imageUrl}
+                onChange={handleAvatarChange}
+              />
+            </div>
+            <p className="text-xs text-zinc-500 text-center">
+              Рекомендуемый размер: 128x128 пикселей
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="h-[1px] bg-zinc-700" />
 
@@ -124,7 +179,7 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
             id="bio"
             value={bio}
             onChange={(e) => handleBioChange(e.target.value)}
-            className="w-full h-24 px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-md text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            className="w-full h-24 px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-md text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
             placeholder="Расскажите немного о себе..."
             maxLength={190}
           />
@@ -183,7 +238,7 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
         <Button 
           onClick={handleSave} 
           disabled={isLoading || !hasChanges}
-          className="bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50"
+          className="bg-primary hover:bg-primary/90 disabled:opacity-50"
         >
           {isLoading ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />

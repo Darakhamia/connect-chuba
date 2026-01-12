@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
 import { currentProfile } from "@/lib/current-profile";
 import { db } from "@/lib/db";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -7,7 +6,6 @@ import { Separator } from "@/components/ui/separator";
 import { NavigationAction } from "./navigation-action";
 import { NavigationItem } from "./navigation-item";
 import { NavigationHome } from "./navigation-home";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 export async function NavigationSidebar() {
   const profile = await currentProfile();
@@ -50,19 +48,6 @@ export async function NavigationSidebar() {
         ))}
       </ScrollArea>
       
-      <Separator className="h-[2px] w-10 bg-border rounded-full mx-auto" />
-      
-      {/* Нижняя панель */}
-      <div className="flex flex-col items-center gap-y-4 pb-3">
-        <ThemeToggle />
-        <UserButton
-          appearance={{
-            elements: {
-              avatarBox: "h-[48px] w-[48px]",
-            },
-          }}
-        />
-      </div>
     </div>
   );
 }

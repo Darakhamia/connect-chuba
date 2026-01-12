@@ -79,6 +79,12 @@
 :root {
   --radius: 0.5rem;
   
+  /* Customizable accent color */
+  --accent-color: #5865f2;
+  
+  /* Chat font size */
+  --chat-font-size: 14px;
+  
   /* Base colors */
   --background: #ffffff;
   --foreground: #2e3338;
@@ -89,8 +95,8 @@
   --popover: #ffffff;
   --popover-foreground: #2e3338;
   
-  /* Primary - Brand color (customizable) */
-  --primary: #5865f2;
+  /* Primary - Brand color (uses accent-color) */
+  --primary: var(--accent-color);
   --primary-foreground: #ffffff;
   
   /* Secondary */
@@ -102,7 +108,7 @@
   --muted-foreground: #6d6f78;
   
   /* Accent */
-  --accent: #5865f2;
+  --accent: var(--accent-color);
   --accent-foreground: #ffffff;
   
   /* Destructive */
@@ -111,7 +117,7 @@
   /* Border & Input */
   --border: #e3e5e8;
   --input: #e3e5e8;
-  --ring: #5865f2;
+  --ring: var(--accent-color);
   
   /* Discord brand colors */
   --discord-blurple: #5865f2;
@@ -159,8 +165,8 @@
   --popover: #1e1f22;
   --popover-foreground: #dbdee1;
   
-  /* Primary - Brand color (customizable) */
-  --primary: #5865f2;
+  /* Primary - Brand color (uses accent-color) */
+  --primary: var(--accent-color);
   --primary-foreground: #ffffff;
   
   /* Secondary */
@@ -172,7 +178,7 @@
   --muted-foreground: #949ba4;
   
   /* Accent */
-  --accent: #5865f2;
+  --accent: var(--accent-color);
   --accent-foreground: #ffffff;
   
   /* Destructive */
@@ -181,7 +187,7 @@
   /* Border & Input */
   --border: #3f4147;
   --input: #1e1f22;
-  --ring: #5865f2;
+  --ring: var(--accent-color);
   
   /* Discord brand colors (same in both themes) */
   --discord-blurple: #5865f2;

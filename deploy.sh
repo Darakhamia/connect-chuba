@@ -1,33 +1,49 @@
 #!/bin/bash
 
-# Скрипт автодеплоя Connect Chuba
-# Использование: ./deploy.sh
+echo "🚀 Deploying Echo..."
 
+# Stop on errors
 set -e
 
-echo "🚀 Начинаем деплой..."
-
-cd ~/connect-chuba
-
-# Пулим изменения из git
-echo "📥 Получаем обновления из Git..."
+# Pull latest changes
+echo "📥 Pulling changes from GitHub..."
 git pull origin main
 
-# Устанавливаем зависимости если package.json изменился
-echo "📦 Проверяем зависимости..."
+# Install dependencies
+echo "📦 Installing dependencies..."
 npm install --legacy-peer-deps
 
-# Генерируем Prisma клиент
-echo "🔧 Генерируем Prisma клиент..."
+# Generate Prisma client
+echo "🔧 Generating Prisma client..."
 npx prisma generate
 
-# Собираем проект
-echo "🏗️ Собираем проект..."
+# Push database changes
+echo "🗄️ Updating database schema..."
+npx prisma db push --accept-data-loss
+
+# Build application
+echo "🔨 Building application..."
 npm run build
 
-# Перезапускаем PM2
-echo "🔄 Перезапускаем сервер..."
-pm2 restart connect-chuba
+# Restart PM2
+echo "♻️ Restarting application..."
+pm2 restart connect-chuba || pm2 start npm --name "connect-chuba" -- start
 
-echo "✅ Деплой завершён!"
-echo "🌐 Сайт: https://chat.airecho.net"
+# Save PM2 config
+pm2 save
+
+# Show status
+echo ""
+echo "✅ Deployment complete!"
+echo ""
+echo "📊 PM2 Status:"
+pm2 status
+
+echo ""
+echo "📝 Recent logs:"
+pm2 logs connect-chuba --lines 10 --nostream
+
+echo ""
+echo "🌐 Your app should be running at: https://chat.airecho.net"
+echo ""
+echo "To view live logs: pm2 logs connect-chuba"

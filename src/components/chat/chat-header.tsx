@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Hash, Search, Pin } from "lucide-react";
+import { Hash, Search, Pin, Music2 } from "lucide-react";
 import { MobileToggle } from "@/components/mobile-toggle";
 import { SocketIndicator } from "@/components/socket-indicator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,9 +20,10 @@ interface ChatHeaderProps {
   name: string;
   type: "channel" | "conversation";
   imageUrl?: string;
+  onMusicClick?: () => void;
 }
 
-export function ChatHeader({ serverId, channelId, conversationId, name, type, imageUrl }: ChatHeaderProps) {
+export function ChatHeader({ serverId, channelId, conversationId, name, type, imageUrl, onMusicClick }: ChatHeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -82,6 +83,19 @@ export function ChatHeader({ serverId, channelId, conversationId, name, type, im
       <p className="font-semibold text-md">{name}</p>
       
       <div className="ml-auto flex items-center gap-2">
+        {/* Music (only for voice channels) */}
+        {type === "channel" && onMusicClick && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onMusicClick}
+            className="h-8 w-8"
+            title="Music"
+          >
+            <Music2 className="h-4 w-4" />
+          </Button>
+        )}
+
         {/* Закрепленные сообщения */}
         {type === "channel" && (
           <Button

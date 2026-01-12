@@ -1,0 +1,383 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Music, Play, Pause, SkipForward, SkipBack, Volume2, Repeat, Shuffle, Plus, X, Upload } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Slider } from "@/components/ui/slider";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { MusicPlaybackManager } from "./playback/music-playback-manager";
+
+interface Track {
+  id: string;
+  source: string;
+  title: string;
+  artist?: string;
+  durationMs: number;
+  thumbnailUrl?: string;
+}
+
+interface QueueItem {
+  id: string;
+  track: Track;
+  addedBy: {
+    id: string;
+    name: string;
+    imageUrl: string;
+  };
+}
+
+interface MusicSession {
+  id: string;
+  state: "IDLE" | "PLAYING" | "PAUSED" | "LOADING";
+  currentTrack?: Track;
+  volume: number;
+  loopMode: "OFF" | "ONE" | "ALL";
+  shuffle: boolean;
+  currentPositionMs: number;
+}
+
+interface MusicPanelProps {
+  serverId: string;
+  voiceChannelId: string;
+  onClose: () => void;
+}
+
+export function MusicPanel({ serverId, voiceChannelId, onClose }: MusicPanelProps) {
+  const [url, setUrl] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [session, setSession] = useState<MusicSession | null>(null);
+  const [queue, setQueue] = useState<QueueItem[]>([]);
+
+  useEffect(() => {
+    initSession();
+    const interval = setInterval(fetchSessionState, 3000);
+    return () => clearInterval(interval);
+  }, [serverId, voiceChannelId]);
+
+  const initSession = async () => {
+    try {
+      const res = await fetch("/api/music/session/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ serverId, voiceChannelId }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setSession({
+          id: data.id,
+          state: data.state,
+          currentTrack: data.currentTrack,
+          volume: data.volume,
+          loopMode: data.loopMode,
+          shuffle: data.shuffle,
+          currentPositionMs: 0,
+        });
+        setQueue(data.queue || []);
+      }
+    } catch (error) {
+      console.error("Failed to init session:", error);
+    }
+  };
+
+  const fetchSessionState = async () => {
+    if (!session) return;
+
+    try {
+      const res = await fetch(`/api/music/session/${session.id}/state`);
+      if (res.ok) {
+        const data = await res.json();
+        setSession({
+          id: data.id,
+          state: data.state,
+          currentTrack: data.currentTrack,
+          volume: data.volume,
+          loopMode: data.loopMode,
+          shuffle: data.shuffle,
+          currentPositionMs: data.currentPositionMs || 0,
+        });
+        setQueue(data.queue || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch session state:", error);
+    }
+  };
+
+  const handleAddTrack = async () => {
+    if (!url.trim() || !session) return;
+
+    setIsLoading(true);
+    try {
+      // Resolve URL
+      const resolveRes = await fetch("/api/music/resolve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+
+      if (!resolveRes.ok) {
+        throw new Error("Failed to resolve URL");
+      }
+
+      const resolved = await resolveRes.json();
+
+      if (resolved.type === "track") {
+        // Add single track to queue
+        await fetch(`/api/music/session/${session.id}/queue`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ trackId: resolved.track.id }),
+        });
+
+        toast.success(`Added: ${resolved.track.title}`);
+      } else {
+        // Add playlist tracks
+        const trackIds = resolved.playlist.tracks.map((t: Track) => t.id);
+        await fetch(`/api/music/session/${session.id}/queue`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ trackIds }),
+        });
+
+        toast.success(`Added ${trackIds.length} tracks from playlist`);
+      }
+
+      setUrl("");
+      fetchSessionState();
+    } catch (error) {
+      console.error("Failed to add track:", error);
+      toast.error("Failed to add track. Check the URL and try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleControl = async (action: string, value?: any) => {
+    if (!session) return;
+
+    try {
+      const res = await fetch(`/api/music/session/${session.id}/control`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, value }),
+      });
+
+      if (res.ok) {
+        fetchSessionState();
+      }
+    } catch (error) {
+      console.error("Control error:", error);
+    }
+  };
+
+  const formatTime = (ms: number) => {
+    const seconds = Math.floor(ms / 1000);
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const handleTrackEnded = () => {
+    // Auto-skip to next track
+    handleControl("skip");
+  };
+
+  return (
+    <div className="w-96 h-full bg-channel-sidebar border-l border-border flex flex-col">
+      {/* Playback Manager (hidden) */}
+      {session && (
+        <MusicPlaybackManager
+          sessionId={session.id}
+          currentTrack={session.currentTrack || null}
+          state={session.state}
+          startedAt={null}
+          offsetMs={0}
+          volume={session.volume}
+          onEnded={handleTrackEnded}
+        />
+      )}
+
+      {/* Header */}
+      <div className="p-4 border-b border-border flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Music className="w-5 h-5 text-primary" />
+          <h2 className="font-semibold text-foreground">Music</h2>
+        </div>
+        <Button variant="ghost" size="icon" onClick={onClose}>
+          <X className="w-4 h-4" />
+        </Button>
+      </div>
+
+      {/* Add Track Input */}
+      <div className="p-4 border-b border-border space-y-2">
+        <div className="flex gap-2">
+          <Input
+            placeholder="Paste YouTube, Spotify, or SoundCloud link..."
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleAddTrack()}
+            disabled={isLoading}
+            className="flex-1 bg-input border-border"
+          />
+          <Button onClick={handleAddTrack} disabled={isLoading || !url.trim()}>
+            <Plus className="w-4 h-4" />
+          </Button>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="flex-1">
+            <Upload className="w-3 h-3 mr-2" />
+            Upload Audio
+          </Button>
+        </div>
+      </div>
+
+      {/* Now Playing */}
+      {session?.currentTrack && (
+        <div className="p-4 border-b border-border space-y-3">
+          <p className="text-xs text-muted-foreground uppercase font-semibold">Now Playing</p>
+          <div className="flex gap-3">
+            {session.currentTrack.thumbnailUrl && (
+              <img
+                src={session.currentTrack.thumbnailUrl}
+                alt={session.currentTrack.title}
+                className="w-16 h-16 rounded object-cover"
+              />
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-foreground truncate">{session.currentTrack.title}</p>
+              {session.currentTrack.artist && (
+                <p className="text-sm text-muted-foreground truncate">{session.currentTrack.artist}</p>
+              )}
+              <p className="text-xs text-muted-foreground mt-1">
+                {formatTime(session.currentPositionMs)} / {formatTime(session.currentTrack.durationMs)}
+              </p>
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <Slider
+            value={[session.currentPositionMs]}
+            max={session.currentTrack.durationMs}
+            step={1000}
+            onValueChange={([value]) => handleControl("seek", value)}
+            className="w-full"
+          />
+
+          {/* Controls */}
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleControl("shuffle")}
+              className={cn(session.shuffle && "text-primary")}
+            >
+              <Shuffle className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => handleControl("back")}>
+              <SkipBack className="w-4 h-4" />
+            </Button>
+            <Button
+              size="icon"
+              onClick={() => handleControl(session.state === "PLAYING" ? "pause" : "play")}
+              className="bg-primary hover:bg-primary/90"
+            >
+              {session.state === "PLAYING" ? (
+                <Pause className="w-4 h-4" />
+              ) : (
+                <Play className="w-4 h-4 ml-0.5" />
+              )}
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => handleControl("skip")}>
+              <SkipForward className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                const modes: ("OFF" | "ONE" | "ALL")[] = ["OFF", "ONE", "ALL"];
+                const currentIndex = modes.indexOf(session.loopMode);
+                const nextMode = modes[(currentIndex + 1) % modes.length];
+                handleControl("loop", nextMode);
+              }}
+              className={cn(session.loopMode !== "OFF" && "text-primary")}
+            >
+              <Repeat className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* Volume */}
+          <div className="flex items-center gap-2">
+            <Volume2 className="w-4 h-4 text-muted-foreground" />
+            <Slider
+              value={[session.volume]}
+              max={100}
+              step={1}
+              onValueChange={([value]) => handleControl("volume", value)}
+              className="flex-1"
+            />
+            <span className="text-xs text-muted-foreground w-8 text-right">{session.volume}%</span>
+          </div>
+        </div>
+      )}
+
+      {/* Queue */}
+      <div className="flex-1 flex flex-col min-h-0">
+        <div className="p-4 pb-2 flex items-center justify-between">
+          <p className="text-xs text-muted-foreground uppercase font-semibold">
+            Queue ({queue.length})
+          </p>
+        </div>
+        <ScrollArea className="flex-1 px-4">
+          <div className="space-y-2 pb-4">
+            {queue.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                Queue is empty. Add some music!
+              </p>
+            ) : (
+              queue.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-3 p-2 rounded hover:bg-secondary group"
+                >
+                  <span className="text-xs text-muted-foreground w-6">{index + 1}</span>
+                  {item.track.thumbnailUrl && (
+                    <img
+                      src={item.track.thumbnailUrl}
+                      alt={item.track.title}
+                      className="w-10 h-10 rounded object-cover"
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {item.track.title}
+                    </p>
+                    {item.track.artist && (
+                      <p className="text-xs text-muted-foreground truncate">{item.track.artist}</p>
+                    )}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={async () => {
+                      await fetch(`/api/music/session/${session?.id}/queue?itemId=${item.id}`, {
+                        method: "DELETE",
+                      });
+                      fetchSessionState();
+                    }}
+                  >
+                    <X className="w-3 h-3" />
+                  </Button>
+                </div>
+              ))
+            )}
+          </div>
+        </ScrollArea>
+      </div>
+    </div>
+  );
+}

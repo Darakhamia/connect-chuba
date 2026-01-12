@@ -1,11 +1,7 @@
 import { redirect } from "next/navigation";
 import { currentProfile } from "@/lib/current-profile";
 import { db } from "@/lib/db";
-import { ChannelType } from "@prisma/client";
-import { ChatHeader } from "@/components/chat/chat-header";
-import { ChatMessages } from "@/components/chat/chat-messages";
-import { ChatInput } from "@/components/chat/chat-input";
-import { MediaRoom } from "@/components/media-room";
+import { ChannelPageClient } from "@/components/channel/channel-page-client";
 
 interface ChannelPageProps {
   params: Promise<{
@@ -35,11 +31,14 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
     },
   });
 
-  // Получаем участника
+  // Получаем участника с profile
   const member = await db.member.findFirst({
     where: {
       serverId,
       profileId: profile.id,
+    },
+    include: {
+      profile: true,
     },
   });
 
@@ -48,68 +47,11 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
   }
 
   return (
-    <div className="bg-chat-area flex flex-col h-full">
-      <ChatHeader
-        name={channel.name}
-        serverId={serverId}
-        channelId={channel.id}
-        type="channel"
-      />
-      
-      {/* Текстовый канал */}
-      {channel.type === ChannelType.TEXT && (
-        <>
-          <ChatMessages
-            member={member}
-            name={channel.name}
-            type="channel"
-            apiUrl="/api/messages"
-            socketUrl="/api/socket/messages"
-            socketQuery={{
-              channelId: channel.id,
-              serverId,
-            }}
-            paramKey="channelId"
-            paramValue={channel.id}
-            chatId={channel.id}
-          />
-          <ChatInput
-            name={channel.name}
-            type="channel"
-            apiUrl="/api/socket/messages"
-            query={{
-              channelId: channel.id,
-              serverId,
-            }}
-          />
-        </>
-      )}
-      
-      {/* Голосовой канал */}
-      {channel.type === ChannelType.AUDIO && (
-        <MediaRoom
-          chatId={channel.id}
-          channelName={channel.name}
-          serverId={server.id}
-          serverName={server.name}
-          username={profile.name}
-          video={false}
-          audio={true}
-        />
-      )}
-      
-      {/* Видео канал */}
-      {channel.type === ChannelType.VIDEO && (
-        <MediaRoom
-          chatId={channel.id}
-          channelName={channel.name}
-          serverId={server.id}
-          serverName={server.name}
-          username={profile.name}
-          video={true}
-          audio={true}
-        />
-      )}
-    </div>
+    <ChannelPageClient
+      channel={channel}
+      member={member}
+      server={server}
+      serverId={serverId}
+    />
   );
 }

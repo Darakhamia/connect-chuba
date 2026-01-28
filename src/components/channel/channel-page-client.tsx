@@ -7,15 +7,17 @@ import { ChatMessages } from "@/components/chat/chat-messages";
 import { ChatInput } from "@/components/chat/chat-input";
 import { MediaRoom } from "@/components/media-room";
 import { MusicPanel } from "@/components/music/music-panel";
+import { MemberWithProfile } from "@/types";
 
 interface ChannelPageClientProps {
   channel: Channel;
   member: Member;
   server: Server;
   serverId: string;
+  members?: MemberWithProfile[];
 }
 
-export function ChannelPageClient({ channel, member, server, serverId }: ChannelPageClientProps) {
+export function ChannelPageClient({ channel, member, server, serverId, members = [] }: ChannelPageClientProps) {
   const [showMusicPanel, setShowMusicPanel] = useState(false);
   const isVoiceChannel = channel.type === ChannelType.AUDIO || channel.type === ChannelType.VIDEO;
 
@@ -50,11 +52,13 @@ export function ChannelPageClient({ channel, member, server, serverId }: Channel
             <ChatInput
               name={channel.name}
               type="channel"
-              apiUrl="/api/socket/messages"
+              apiUrl="/api/messages"
               query={{
                 channelId: channel.id,
                 serverId,
               }}
+              members={members}
+              channelId={channel.id}
             />
           </>
         )}

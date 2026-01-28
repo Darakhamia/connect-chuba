@@ -39,6 +39,26 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
     },
     include: {
       profile: true,
+      customRoles: {
+        include: {
+          role: true,
+        },
+      },
+    },
+  });
+
+  // Получаем всех участников сервера для упоминаний
+  const members = await db.member.findMany({
+    where: {
+      serverId,
+    },
+    include: {
+      profile: true,
+      customRoles: {
+        include: {
+          role: true,
+        },
+      },
     },
   });
 
@@ -52,6 +72,7 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
       member={member}
       server={server}
       serverId={serverId}
+      members={members}
     />
   );
 }

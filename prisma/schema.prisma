@@ -119,9 +119,10 @@ model Server {
   members    Member[]
   categories Category[]
   channels   Channel[]
+  roles      Role[]
   musicSessions MusicSession[]
   auditLogs  AuditLog[]
-  
+
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -150,30 +151,82 @@ model Category {
   @@map("categories")
 }
 
+// Role - Custom roles with colors for servers
+model Role {
+  id       String  @id @default(uuid())
+  name     String
+  color    String  @default("#99AAB5") // Default Discord grey
+  position Int     @default(0)         // Higher = more permissions
+
+  // Permissions (bitfield-like booleans for simplicity)
+  canManageServer    Boolean @default(false)
+  canManageChannels  Boolean @default(false)
+  canManageRoles     Boolean @default(false)
+  canManageMembers   Boolean @default(false)
+  canBanMembers      Boolean @default(false)
+  canKickMembers     Boolean @default(false)
+  canManageMessages  Boolean @default(false)
+  canMentionEveryone Boolean @default(false)
+
+  // Server relation
+  serverId String
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  // Members with this role
+  memberRoles MemberRole2[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([serverId])
+  @@map("roles")
+}
+
+// MemberRole2 - Junction table for members and custom roles
+model MemberRole2 {
+  id       String @id @default(uuid())
+
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  roleId   String
+  role     Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([memberId, roleId])
+  @@index([memberId])
+  @@index([roleId])
+  @@map("member_roles")
+}
+
 // Member - User's membership in a server with role
 model Member {
   id   String     @id @default(uuid())
   role MemberRole @default(GUEST)
-  
+
   // Profile relation
   profileId String
   profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  
+
   // Server relation
   serverId String
   server   Server  @relation(fields: [serverId], references: [id], onDelete: Cascade)
-  
+
+  // Custom roles
+  customRoles MemberRole2[]
+
   // Relations
   messages              Message[]
   messageReactions      MessageReaction[]
   directMessagesSent    DirectMessage[] @relation("DirectMessageSender")
   directMessagesReceived DirectMessage[] @relation("DirectMessageReceiver")
   dmMessageReactions    DMMessageReaction[]
-  
+
   // Conversations as initiator or receiver
   conversationsInitiated Conversation[] @relation("MemberOne")
   conversationsReceived  Conversation[] @relation("MemberTwo")
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -220,29 +273,35 @@ model Message {
   id      String  @id @default(uuid())
   content String  @db.Text
   fileUrl String? @db.Text
-  
+
   // Soft delete
   deleted Boolean @default(false)
-  
+
   // Pinned message
   pinned Boolean @default(false)
-  
+
+  // Reply to another message
+  replyToId String?
+  replyTo   Message?  @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies   Message[] @relation("MessageReplies")
+
   // Author relation
   memberId String
   member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  
+
   // Channel relation
   channelId String
   channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  
+
   // Reactions
   reactions MessageReaction[]
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([memberId])
   @@index([channelId])
+  @@index([replyToId])
   @@map("messages")
 }
 

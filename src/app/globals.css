@@ -71,6 +71,21 @@
   --color-chat-area: var(--chat-area);
   --color-chat-input: var(--chat-input);
   --color-user-panel: var(--user-panel);
+
+  /* Chuba minimalist colors */
+  --color-chuba-dark: #0a0a0a;
+  --color-chuba-grey: #1a1a1a;
+  --color-chuba-grey-light: #2a2a2a;
+  --color-chuba-accent: #2563eb;
+  --color-chuba-accent-hover: #1d4ed8;
+  --color-chuba-text: #e5e5e5;
+  --color-chuba-text-muted: #a1a1a1;
+  --color-chuba-border: #333333;
+
+  /* Chuba animations */
+  --animate-fade-in: fadeIn 0.2s ease-in;
+  --animate-slide-up: slideUp 0.3s ease-out;
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* ==========================================
@@ -308,6 +323,11 @@
   to {
     transform: translateX(0);
   }
+}
+
+@keyframes slideUp {
+  0% { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
 }
 
 @keyframes pulse-ring {

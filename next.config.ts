@@ -1,17 +1,23 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Для Docker деплоя
   output: "standalone",
-  
-  // Пропускать ошибки TypeScript на билде (для Windows совместимости)
+  compress: true,
+  poweredByHeader: false,
+
   typescript: {
     ignoreBuildErrors: true,
   },
   eslint: {
     ignoreDuringBuilds: true,
   },
-  
+
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "2mb",
+    },
+  },
+
   images: {
     remotePatterns: [
       {

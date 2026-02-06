@@ -243,6 +243,8 @@ model Message {
 
   @@index([memberId])
   @@index([channelId])
+  @@index([channelId, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
   @@map("messages")
 }
 

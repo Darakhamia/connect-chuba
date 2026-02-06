@@ -3,7 +3,8 @@ import { currentProfile } from "@/lib/current-profile";
 import { db } from "@/lib/db";
 import { Message } from "@prisma/client";
 
-const MESSAGES_BATCH = 15;
+const DEFAULT_MESSAGES_BATCH = 15;
+const MAX_MESSAGES_BATCH = 100;
 
 export async function GET(req: Request) {
   try {
@@ -12,6 +13,11 @@ export async function GET(req: Request) {
 
     const cursor = searchParams.get("cursor");
     const channelId = searchParams.get("channelId");
+    const limitParam = searchParams.get("limit");
+    const limit = Math.min(
+      Math.max(1, parseInt(limitParam || String(DEFAULT_MESSAGES_BATCH), 10) || DEFAULT_MESSAGES_BATCH),
+      MAX_MESSAGES_BATCH
+    );
 
     if (!profile) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -25,7 +31,7 @@ export async function GET(req: Request) {
 
     if (cursor) {
       messages = await db.message.findMany({
-        take: MESSAGES_BATCH,
+        take: limit,
         skip: 1,
         cursor: {
           id: cursor,
@@ -46,7 +52,7 @@ export async function GET(req: Request) {
       });
     } else {
       messages = await db.message.findMany({
-        take: MESSAGES_BATCH,
+        take: limit,
         where: {
           channelId,
         },
@@ -65,8 +71,8 @@ export async function GET(req: Request) {
 
     let nextCursor = null;
 
-    if (messages.length === MESSAGES_BATCH) {
-      nextCursor = messages[MESSAGES_BATCH - 1].id;
+    if (messages.length === limit) {
+      nextCursor = messages[limit - 1].id;
     }
 
     return NextResponse.json({

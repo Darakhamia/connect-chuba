@@ -11,7 +11,7 @@ COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
 
 # Устанавливаем зависимости
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Собираем приложение
 FROM base AS builder

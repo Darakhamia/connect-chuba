@@ -1,24 +1,24 @@
 version: '3.8'
 
 services:
-  # База данных PostgreSQL
+  # База данных PostgreSQL (только внутренний, порт наружу НЕ открываем)
   db:
     image: postgres:15-alpine
     container_name: connect-chuba-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: your_secure_password_here
+      POSTGRES_USER: chuba_user
+      POSTGRES_PASSWORD: Ch8b4_Pr0d_2026!
       POSTGRES_DB: connect_chuba
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U chuba_user"]
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - internal
 
   # Приложение Connect Chuba
   app:
@@ -27,15 +27,34 @@ services:
       dockerfile: Dockerfile
     container_name: connect-chuba-app
     restart: unless-stopped
-    ports:
-      - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:your_secure_password_here@db:5432/connect_chuba
+      - DATABASE_URL=postgresql://chuba_user:Ch8b4_Pr0d_2026!@db:5432/connect_chuba
     env_file:
       - .env
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - internal
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.connect-chuba.rule=Host(`chat.airecho.net`)"
+      - "traefik.http.routers.connect-chuba.entrypoints=websecure"
+      - "traefik.http.routers.connect-chuba.tls=true"
+      - "traefik.http.routers.connect-chuba.tls.certresolver=letsencrypt"
+      - "traefik.http.services.connect-chuba.loadbalancer.server.port=3000"
+      # HTTP -> HTTPS redirect
+      - "traefik.http.routers.connect-chuba-http.rule=Host(`chat.airecho.net`)"
+      - "traefik.http.routers.connect-chuba-http.entrypoints=web"
+      - "traefik.http.routers.connect-chuba-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
 volumes:
   postgres_data:
+
+networks:
+  internal:
+    driver: bridge
+  web:
+    external: true

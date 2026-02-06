@@ -41,14 +41,8 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.connect-chuba.rule=Host(`chat.airecho.net`)"
       - "traefik.http.routers.connect-chuba.entrypoints=websecure"
-      - "traefik.http.routers.connect-chuba.tls=true"
       - "traefik.http.routers.connect-chuba.tls.certresolver=letsencrypt"
       - "traefik.http.services.connect-chuba.loadbalancer.server.port=3000"
-      # HTTP -> HTTPS redirect
-      - "traefik.http.routers.connect-chuba-http.rule=Host(`chat.airecho.net`)"
-      - "traefik.http.routers.connect-chuba-http.entrypoints=web"
-      - "traefik.http.routers.connect-chuba-http.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
 volumes:
   postgres_data:

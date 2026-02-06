@@ -36,7 +36,7 @@ services:
         condition: service_healthy
     networks:
       - internal
-      - web
+      - traefik-public
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.connect-chuba.rule=Host(`chat.airecho.net`)"
@@ -56,5 +56,5 @@ volumes:
 networks:
   internal:
     driver: bridge
-  web:
+  traefik-public:
     external: true

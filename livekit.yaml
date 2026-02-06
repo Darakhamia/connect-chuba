@@ -6,5 +6,4 @@ rtc:
 redis:
   address: redis:6379
 keys:
-  API_KEY: your-api-key-here
-  API_SECRET: your-secret-key-here
+  APIkeyChuba2026: secretChuba2026prodX9kLm

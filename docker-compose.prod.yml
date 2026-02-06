@@ -8,13 +8,13 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://user:password@postgres:5432/connectchuba
+      - DATABASE_URL=postgresql://chuba_user:Ch8b4_Pr0d_2026!@postgres:5432/connectchuba
       - REDIS_URL=redis://redis:6379
-      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
-      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}
-      - NEXT_PUBLIC_LIVEKIT_URL=wss://your-domain.com:7880
+      - LIVEKIT_API_KEY=APIkeyChuba2026
+      - LIVEKIT_API_SECRET=secretChuba2026prodX9kLm
+      - NEXT_PUBLIC_LIVEKIT_URL=wss://chat.airecho.net:7880
     env_file:
-      - .env
+      - .env.production
     depends_on:
       postgres:
         condition: service_healthy
@@ -27,13 +27,13 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: chuba_user
+      POSTGRES_PASSWORD: Ch8b4_Pr0d_2026!
       POSTGRES_DB: connectchuba
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d connectchuba"]
+      test: ["CMD-SHELL", "pg_isready -U chuba_user -d connectchuba"]
       interval: 5s
       timeout: 5s
       retries: 5

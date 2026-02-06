@@ -42,7 +42,7 @@ $DC -f docker-compose.prod.yml --env-file .env.production up -d --build
 echo ""
 echo "[4/5] Waiting for PostgreSQL to be healthy..."
 for i in {1..30}; do
-    if $DC -f docker-compose.prod.yml exec -T postgres pg_isready -U user -d connectchuba &>/dev/null; then
+    if $DC -f docker-compose.prod.yml exec -T postgres pg_isready -U chuba_user -d connectchuba &>/dev/null; then
         echo "PostgreSQL is ready!"
         break
     fi

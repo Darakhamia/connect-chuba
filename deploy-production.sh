@@ -4,10 +4,10 @@ set -e
 echo "=== Connect Chuba - Production Deployment ==="
 
 # Check environment
-if [ ! -f .env.production ]; then
-    echo "ERROR: .env.production file not found!"
-    echo "Copy .env.example to .env.production and fill in your values:"
-    echo "  cp .env.example .env.production"
+if [ ! -f .env ]; then
+    echo "ERROR: .env file not found!"
+    echo "Copy .env.example to .env and fill in your values:"
+    echo "  cp .env.example .env"
     exit 1
 fi
 
@@ -25,24 +25,29 @@ echo "Using: $DC"
 
 # Stop old containers
 echo ""
-echo "[1/5] Stopping old containers..."
-$DC -f docker-compose.prod.yml down 2>/dev/null || true
+echo "[1/6] Stopping old containers..."
+$DC down 2>/dev/null || true
 
 # Pull latest changes
 echo ""
-echo "[2/5] Pulling latest changes..."
+echo "[2/6] Pulling latest changes..."
 git pull origin main || echo "WARNING: git pull failed, continuing with current code..."
 
-# Build and start containers
+# Clean Docker build cache to avoid stale hashes
 echo ""
-echo "[3/5] Building and starting containers..."
-$DC -f docker-compose.prod.yml --env-file .env.production up -d --build
+echo "[3/6] Pruning Docker build cache..."
+docker builder prune -af 2>/dev/null || true
+
+# Build and start containers (no cache to avoid hash mismatches)
+echo ""
+echo "[4/6] Building and starting containers..."
+$DC up -d --build --no-cache
 
 # Wait for PostgreSQL to be ready
 echo ""
-echo "[4/5] Waiting for PostgreSQL to be healthy..."
+echo "[5/6] Waiting for PostgreSQL to be healthy..."
 for i in {1..30}; do
-    if $DC -f docker-compose.prod.yml exec -T postgres pg_isready -U chuba_user -d connectchuba &>/dev/null; then
+    if $DC exec -T db pg_isready -U chuba_user -d connect_chuba &>/dev/null; then
         echo "PostgreSQL is ready!"
         break
     fi
@@ -52,12 +57,21 @@ done
 
 # Run database migrations
 echo ""
-echo "[5/5] Running database migrations..."
-$DC -f docker-compose.prod.yml exec -T app npx prisma migrate deploy || echo "WARNING: Migration failed - you may need to run it manually"
+echo "[6/6] Running database migrations..."
+docker run --rm \
+    --network connect-chuba_internal \
+    -v "$(pwd)/prisma:/app/prisma" \
+    -e 'DATABASE_URL=postgresql://chuba_user:Ch8b4_Pr0d_2026!@db:5432/connect_chuba' \
+    -w /app \
+    node:20-alpine sh -c "npx prisma@6 db push --skip-generate" \
+    || echo "WARNING: Migration failed - you may need to run it manually"
 
 echo ""
 echo "=== Deployment complete! ==="
 echo ""
 
 # Show container status
-$DC -f docker-compose.prod.yml ps
+$DC ps
+
+echo ""
+echo "Check the site at: https://chat.airecho.net"

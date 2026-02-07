@@ -44,7 +44,7 @@ export async function GET(req: Request) {
 
     const token = await at.toJwt();
 
-    return NextResponse.json({ token });
+    return NextResponse.json({ token, url: wsUrl });
   } catch (error) {
     console.log("[LIVEKIT_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });

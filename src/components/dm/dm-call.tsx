@@ -21,13 +21,14 @@ export function DMCall({
   onDisconnect,
 }: DMCallProps) {
   const [token, setToken] = useState("");
+  const [serverUrl, setServerUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
         const resp = await fetch(
-          `/api/livekit?room=dm-${conversationId}&username=${profileName}`
+          `/api/livekit?room=dm-${conversationId}&username=${encodeURIComponent(profileName)}`
         );
 
         if (!resp.ok) {
@@ -37,8 +38,9 @@ export function DMCall({
 
         const data = await resp.json();
         setToken(data.token);
+        setServerUrl(data.url);
       } catch (e: unknown) {
-        console.error(e);
+        console.error("[LiveKit DM] Error:", e);
         setError(e instanceof Error ? e.message : "Не удалось подключиться");
       }
     })();
@@ -55,7 +57,7 @@ export function DMCall({
     );
   }
 
-  if (!token) {
+  if (!token || !serverUrl) {
     return (
       <div className="flex-1 flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -67,12 +69,16 @@ export function DMCall({
     <div className="flex-1 bg-background">
       <LiveKitRoom
         data-lk-theme="default"
-        serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
+        serverUrl={serverUrl}
         token={token}
         connect={true}
         video={isVideo}
         audio={true}
         onDisconnected={onDisconnect}
+        onError={(err) => {
+          console.error("[LiveKit DM] Connection error:", err);
+          setError(`Ошибка: ${err.message}`);
+        }}
       >
         <VideoConference />
       </LiveKitRoom>

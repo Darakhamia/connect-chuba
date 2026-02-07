@@ -16,16 +16,17 @@ interface MediaRoomProps {
   audio: boolean;
 }
 
-export function MediaRoom({ 
-  chatId, 
+export function MediaRoom({
+  chatId,
   channelName,
   serverId,
   serverName,
   username,
-  video, 
-  audio 
+  video,
+  audio
 }: MediaRoomProps) {
   const [token, setToken] = useState("");
+  const [serverUrl, setServerUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
   const { joinVoice, leaveVoice, activeChannelId } = useVoice();
 
@@ -40,22 +41,21 @@ export function MediaRoom({
         isVideo: video,
       });
     }
-
-    // При размонтировании НЕ выходим автоматически
-    // Выход только по кнопке Leave
   }, [chatId, channelName, serverId, serverName, video, joinVoice, activeChannelId]);
 
   useEffect(() => {
     (async () => {
       try {
+        console.log("[LiveKit] Fetching token for room:", chatId, "user:", username);
+
         const resp = await fetch(
           `/api/livekit?room=${chatId}&username=${encodeURIComponent(username)}`
         );
-        
+
         if (!resp.ok) {
           const text = await resp.text();
           if (text === "LiveKit not configured") {
-            setError("LiveKit не настроен. Добавьте ключи в .env файл.");
+            setError("LiveKit не настроен. Добавьте LIVEKIT_API_KEY и LIVEKIT_API_SECRET в .env");
           } else {
             setError(`Ошибка: ${text}`);
           }
@@ -63,10 +63,12 @@ export function MediaRoom({
         }
 
         const data = await resp.json();
+        console.log("[LiveKit] Token obtained, server URL:", data.url);
         setToken(data.token);
+        setServerUrl(data.url);
       } catch (e) {
-        console.error(e);
-        setError("Не удалось подключиться к серверу");
+        console.error("[LiveKit] Token fetch error:", e);
+        setError("Не удалось получить токен LiveKit");
       }
     })();
   }, [chatId, username]);
@@ -74,17 +76,14 @@ export function MediaRoom({
   if (error) {
     return (
       <div className="flex flex-col flex-1 justify-center items-center">
-        <p className="text-muted-foreground text-sm text-center px-4">
+        <p className="text-destructive text-sm text-center px-4">
           {error}
-        </p>
-        <p className="text-muted-foreground text-xs mt-2">
-          Для голосовых/видео каналов нужны ключи LiveKit
         </p>
       </div>
     );
   }
 
-  if (token === "") {
+  if (!token || !serverUrl) {
     return (
       <div className="flex flex-col flex-1 justify-center items-center">
         <Loader2 className="h-7 w-7 text-muted-foreground animate-spin my-4" />
@@ -96,12 +95,16 @@ export function MediaRoom({
   return (
     <LiveKitRoom
       data-lk-theme="default"
-      serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
+      serverUrl={serverUrl}
       token={token}
       connect={true}
       video={video}
       audio={audio}
       onDisconnected={() => leaveVoice()}
+      onError={(err) => {
+        console.error("[LiveKit] Connection error:", err);
+        setError(`Ошибка подключения: ${err.message}`);
+      }}
     >
       <VideoConference />
     </LiveKitRoom>

@@ -19,6 +19,13 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# NEXT_PUBLIC_ переменные нужны при билде (вшиваются в клиентский бандл)
+ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+ARG NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+ARG NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_LIVEKIT_URL
+
 # Генерируем Prisma Client
 RUN npx prisma generate
 

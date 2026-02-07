@@ -3,11 +3,10 @@ import { persist } from "zustand/middleware";
 
 interface SettingsState {
   // Appearance
-  accentColor: string;
-  backgroundColor: string; // New - background theme color
+  theme: string;
   fontSize: number;
   messageDisplay: "compact" | "cozy";
-  
+
   // Voice
   selectedAudioInput: string;
   selectedAudioOutput: string;
@@ -15,7 +14,7 @@ interface SettingsState {
   inputVolume: number;
   outputVolume: number;
   screenShareQuality: "480" | "720" | "1080";
-  
+
   // Notifications
   desktopNotifications: boolean;
   soundNotifications: boolean;
@@ -30,20 +29,19 @@ interface SettingsState {
     call: boolean;
     deafen: boolean;
   };
-  
+
   // Actions
-  setAccentColor: (color: string) => void;
-  setBackgroundColor: (color: string) => void;
+  setThemeId: (theme: string) => void;
   setFontSize: (size: number) => void;
   setMessageDisplay: (display: "compact" | "cozy") => void;
-  
+
   setSelectedAudioInput: (deviceId: string) => void;
   setSelectedAudioOutput: (deviceId: string) => void;
   setSelectedVideoInput: (deviceId: string) => void;
   setInputVolume: (volume: number) => void;
   setOutputVolume: (volume: number) => void;
   setScreenShareQuality: (quality: "480" | "720" | "1080") => void;
-  
+
   setDesktopNotifications: (enabled: boolean) => void;
   setSoundNotifications: (enabled: boolean) => void;
   setMentionNotifications: (enabled: boolean) => void;
@@ -55,19 +53,17 @@ interface SettingsState {
 export const useSettings = create<SettingsState>()(
   persist(
     (set) => ({
-      // Default values
-      accentColor: "acid",
-      backgroundColor: "dark", // dark, darker, midnight, amoled
+      theme: "acid",
       fontSize: 14,
       messageDisplay: "cozy",
-      
+
       selectedAudioInput: "",
       selectedAudioOutput: "",
       selectedVideoInput: "",
       inputVolume: 80,
       outputVolume: 100,
       screenShareQuality: "720",
-      
+
       desktopNotifications: true,
       soundNotifications: true,
       mentionNotifications: true,
@@ -81,20 +77,18 @@ export const useSettings = create<SettingsState>()(
         call: true,
         deafen: true,
       },
-      
-      // Actions
-      setAccentColor: (color) => set({ accentColor: color }),
-      setBackgroundColor: (color) => set({ backgroundColor: color }),
+
+      setThemeId: (theme) => set({ theme }),
       setFontSize: (size) => set({ fontSize: size }),
       setMessageDisplay: (display) => set({ messageDisplay: display }),
-      
+
       setSelectedAudioInput: (deviceId) => set({ selectedAudioInput: deviceId }),
       setSelectedAudioOutput: (deviceId) => set({ selectedAudioOutput: deviceId }),
       setSelectedVideoInput: (deviceId) => set({ selectedVideoInput: deviceId }),
       setInputVolume: (volume) => set({ inputVolume: volume }),
       setOutputVolume: (volume) => set({ outputVolume: volume }),
       setScreenShareQuality: (quality) => set({ screenShareQuality: quality }),
-      
+
       setDesktopNotifications: (enabled) => set({ desktopNotifications: enabled }),
       setSoundNotifications: (enabled) => set({ soundNotifications: enabled }),
       setMentionNotifications: (enabled) => set({ mentionNotifications: enabled }),

@@ -1,64 +1,28 @@
 "use client";
 
-import { useTheme } from "@/components/providers/theme-provider";
 import { useSettings } from "@/hooks/use-settings-store";
+import { themes, getThemeById } from "@/components/providers/appearance-provider";
 import { cn } from "@/lib/utils";
-import { Sun, Moon, Monitor, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
-const themes = [
-  { id: "light" as const, label: "Светлая", icon: Sun, preview: "bg-white" },
-  { id: "dark" as const, label: "Тёмная", icon: Moon, preview: "bg-[#111111]" },
-  { id: "system" as const, label: "Системная", icon: Monitor, preview: "bg-gradient-to-r from-white to-[#111111]" },
-];
-
-const accentColors = [
-  { id: "indigo", color: "#5865f2", label: "Индиго" },
-  { id: "green", color: "#3ba55c", label: "Зелёный" },
-  { id: "yellow", color: "#faa61a", label: "Жёлтый" },
-  { id: "red", color: "#ed4245", label: "Красный" },
-  { id: "pink", color: "#eb459e", label: "Розовый" },
-  { id: "purple", color: "#9b59b6", label: "Фиолетовый" },
-  { id: "cyan", color: "#00aff4", label: "Голубой" },
-  { id: "orange", color: "#e67e22", label: "Оранжевый" },
-];
-
-const backgroundThemes = [
-  { id: "dark", label: "Тёмная", preview: "#313338", description: "Стандартная тёмная тема" },
-  { id: "darker", label: "Темнее", preview: "#1a1a1d", description: "Более тёмные оттенки" },
-  { id: "midnight", label: "Полночь", preview: "#0e1525", description: "Синеватые тона" },
-  { id: "amoled", label: "AMOLED", preview: "#000000", description: "Чистый чёрный" },
-];
-
 export function AppearanceSettings() {
-  const { theme, setTheme } = useTheme();
-  const { 
-    accentColor, 
-    setAccentColor, 
-    backgroundColor,
-    setBackgroundColor,
-    fontSize, 
+  const {
+    theme,
+    setThemeId,
+    fontSize,
     setFontSize,
     messageDisplay,
     setMessageDisplay
   } = useSettings();
 
-  const handleThemeChange = (newTheme: "light" | "dark" | "system") => {
-    setTheme(newTheme);
-    toast.success(`Тема: ${themes.find(t => t.id === newTheme)?.label}`);
-  };
+  const currentTheme = getThemeById(theme);
 
-  const handleAccentChange = (colorId: string) => {
-    setAccentColor(colorId);
-    const color = accentColors.find(c => c.id === colorId);
-    toast.success(`Акцент: ${color?.label}`);
-  };
-
-  const handleBackgroundChange = (bgId: string) => {
-    setBackgroundColor(bgId);
-    const bg = backgroundThemes.find(b => b.id === bgId);
-    toast.success(`Фон: ${bg?.label}`);
+  const handleThemeChange = (themeId: string) => {
+    setThemeId(themeId);
+    const t = themes.find(t => t.id === themeId);
+    toast.success(`Тема: ${t?.name}`);
   };
 
   const handleFontSizeChange = (size: number) => {
@@ -75,37 +39,117 @@ export function AppearanceSettings() {
       {/* Theme selection */}
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-semibold text-foreground mb-1">Режим</h3>
-          <p className="text-sm text-[#555]">Светлая или тёмная тема</p>
+          <h3 className="text-lg font-semibold text-foreground mb-1">Тема интерфейса</h3>
+          <p className="text-sm text-muted-foreground">Выберите тему — она изменит весь интерфейс</p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {themes.map((t) => {
-            const Icon = t.icon;
             const isActive = theme === t.id;
-            
+
             return (
               <button
                 key={t.id}
                 onClick={() => handleThemeChange(t.id)}
                 className={cn(
-                  "relative p-4 rounded-lg border-2 transition-all",
+                  "relative rounded-lg border-2 transition-all overflow-hidden group",
                   isActive
-                    ? "border-primary bg-[#141414]"
-                    : "border-[#1a1a1a] bg-[#141414]/50 hover:border-[#222]"
+                    ? "border-primary ring-1 ring-primary/30"
+                    : "border-border hover:border-muted-foreground/30"
                 )}
               >
-                {isActive && (
-                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                    <Check className="w-3 h-3 text-foreground" />
+                {/* Theme preview — mini mockup */}
+                <div className="h-20 flex">
+                  {/* Sidebar preview */}
+                  <div
+                    className="w-1/4 flex flex-col items-center pt-2 gap-1"
+                    style={{ backgroundColor: t.preview.sidebar }}
+                  >
+                    <div
+                      className="w-4 h-4 rounded-full"
+                      style={{ backgroundColor: t.preview.accent }}
+                    />
+                    <div
+                      className="w-4 h-4 rounded-full opacity-30"
+                      style={{ backgroundColor: t.preview.accent }}
+                    />
+                    <div
+                      className="w-4 h-4 rounded-full opacity-15"
+                      style={{ backgroundColor: t.preview.accent }}
+                    />
                   </div>
-                )}
-                
-                <div className={cn("w-full h-12 rounded-md mb-3", t.preview)} />
-                
-                <div className="flex items-center gap-2">
-                  <Icon className="w-4 h-4 text-[#555]" />
-                  <span className="text-sm text-foreground">{t.label}</span>
+                  {/* Main area preview */}
+                  <div
+                    className="flex-1 p-2 flex flex-col gap-1.5"
+                    style={{ backgroundColor: t.preview.main }}
+                  >
+                    {/* Fake message lines */}
+                    <div className="flex items-center gap-1.5">
+                      <div
+                        className="w-3 h-3 rounded-full shrink-0"
+                        style={{ backgroundColor: t.preview.accent, opacity: 0.6 }}
+                      />
+                      <div
+                        className="h-1.5 rounded-full flex-1"
+                        style={{ backgroundColor: t.preview.accent, opacity: 0.15 }}
+                      />
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div
+                        className="w-3 h-3 rounded-full shrink-0"
+                        style={{ backgroundColor: t.preview.accent, opacity: 0.4 }}
+                      />
+                      <div
+                        className="h-1.5 rounded-full w-3/4"
+                        style={{ backgroundColor: t.preview.accent, opacity: 0.1 }}
+                      />
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div
+                        className="w-3 h-3 rounded-full shrink-0"
+                        style={{ backgroundColor: t.preview.accent, opacity: 0.5 }}
+                      />
+                      <div
+                        className="h-1.5 rounded-full w-1/2"
+                        style={{ backgroundColor: t.preview.accent, opacity: 0.12 }}
+                      />
+                    </div>
+                    {/* Fake input */}
+                    <div className="mt-auto">
+                      <div
+                        className="h-2 rounded-sm"
+                        style={{ backgroundColor: t.preview.accent, opacity: 0.08 }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Label */}
+                <div
+                  className="px-3 py-2 text-left"
+                  style={{ backgroundColor: t.preview.sidebar }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p
+                        className="text-sm font-semibold"
+                        style={{ color: isActive ? t.preview.accent : "#999" }}
+                      >
+                        {t.name}
+                      </p>
+                      <p className="text-[10px]" style={{ color: "#555" }}>
+                        {t.description}
+                      </p>
+                    </div>
+                    {isActive && (
+                      <div
+                        className="w-5 h-5 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: t.preview.accent }}
+                      >
+                        <Check className="w-3 h-3" style={{ color: t.preview.sidebar }} />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </button>
             );
@@ -113,178 +157,85 @@ export function AppearanceSettings() {
         </div>
       </div>
 
-      <div className="h-[1px] bg-[#1a1a1a]" />
-
-      {/* Background theme */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-semibold text-foreground mb-1">Фоновая тема</h3>
-          <p className="text-sm text-[#555]">Выберите оттенки фона интерфейса</p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          {backgroundThemes.map((bg) => (
-            <button
-              key={bg.id}
-              onClick={() => handleBackgroundChange(bg.id)}
-              className={cn(
-                "relative p-3 rounded-lg border-2 transition-all text-left",
-                backgroundColor === bg.id
-                  ? "border-primary bg-[#141414]"
-                  : "border-[#1a1a1a] bg-[#141414]/50 hover:border-[#222]"
-              )}
-            >
-              {backgroundColor === bg.id && (
-                <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                  <Check className="w-2.5 h-2.5 text-foreground" />
-                </div>
-              )}
-              
-              <div 
-                className="w-full h-8 rounded mb-2 border border-[#222]"
-                style={{ backgroundColor: bg.preview }}
-              />
-              <p className="text-sm font-medium text-foreground">{bg.label}</p>
-              <p className="text-xs text-[#444]">{bg.description}</p>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="h-[1px] bg-[#1a1a1a]" />
-
-      {/* Accent color */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-semibold text-foreground mb-1">Акцентный цвет</h3>
-          <p className="text-sm text-[#555]">Основной цвет кнопок и выделений</p>
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          {accentColors.map((color) => (
-            <button
-              key={color.id}
-              onClick={() => handleAccentChange(color.id)}
-              className="group relative"
-              title={color.label}
-            >
-              <div
-                className={cn(
-                  "w-10 h-10 rounded-full ring-2 transition-all",
-                  accentColor === color.id 
-                    ? "ring-white ring-offset-2 ring-offset-[#111111]" 
-                    : "ring-transparent group-hover:ring-white/30"
-                )}
-                style={{ backgroundColor: color.color }}
-              />
-              {accentColor === color.id && (
-                <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-white flex items-center justify-center">
-                  <Check className="w-3 h-3" style={{ color: color.color }} />
-                </div>
-              )}
-            </button>
-          ))}
-        </div>
-        
-        {/* Preview */}
-        <div className="p-4 bg-[#141414] rounded-lg space-y-3">
-          <p className="text-sm text-[#555]">Предпросмотр акцента:</p>
-          <div className="flex items-center gap-3">
-            <button 
-              className="px-4 py-2 rounded-md text-foreground text-sm font-medium"
-              style={{ backgroundColor: accentColors.find(c => c.id === accentColor)?.color }}
-            >
-              Кнопка
-            </button>
-            <div 
-              className="px-3 py-1 rounded text-foreground text-sm"
-              style={{ backgroundColor: `${accentColors.find(c => c.id === accentColor)?.color}33` }}
-            >
-              Выделение
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="h-[1px] bg-[#1a1a1a]" />
+      <div className="h-[1px] bg-border" />
 
       {/* Font size */}
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold text-foreground mb-1">Размер текста</h3>
-          <p className="text-sm text-[#555]">Размер текста в чате ({fontSize}px)</p>
+          <p className="text-sm text-muted-foreground">Размер текста в чате ({fontSize}px)</p>
         </div>
 
         <div className="flex items-center gap-4">
-          <Label className="text-[#555] text-sm">A</Label>
+          <Label className="text-muted-foreground text-sm">A</Label>
           <input
             type="range"
             min="12"
             max="20"
             value={fontSize}
             onChange={(e) => handleFontSizeChange(Number(e.target.value))}
-            className="flex-1 h-2 bg-[#1a1a1a] rounded-lg appearance-none cursor-pointer"
-            style={{ accentColor: accentColors.find(c => c.id === accentColor)?.color }}
+            className="flex-1 h-2 bg-secondary rounded-lg appearance-none cursor-pointer"
+            style={{ accentColor: currentTheme.preview.accent }}
           />
-          <Label className="text-[#555] text-lg">A</Label>
+          <Label className="text-muted-foreground text-lg">A</Label>
         </div>
 
         {/* Preview */}
-        <div className="p-4 bg-[#141414] rounded-lg">
-          <p className="text-[#555] text-xs mb-2">Предпросмотр:</p>
+        <div className="p-4 bg-card rounded-lg">
+          <p className="text-muted-foreground text-xs mb-2">Предпросмотр:</p>
           <p className="text-foreground" style={{ fontSize: `${fontSize}px` }}>
             Привет! Это пример сообщения в чате.
           </p>
         </div>
       </div>
 
-      <div className="h-[1px] bg-[#1a1a1a]" />
+      <div className="h-[1px] bg-border" />
 
       {/* Message display */}
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold text-foreground mb-1">Отображение сообщений</h3>
-          <p className="text-sm text-[#555]">Стиль отображения сообщений</p>
+          <p className="text-sm text-muted-foreground">Стиль отображения сообщений</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <button 
+          <button
             onClick={() => handleMessageDisplayChange("compact")}
             className={cn(
               "p-4 rounded-lg border-2 transition-all",
               messageDisplay === "compact"
-                ? "border-primary bg-[#141414]"
-                : "border-[#1a1a1a] bg-[#141414]/50 hover:border-[#222]"
+                ? "border-primary bg-card"
+                : "border-border bg-card/50 hover:border-muted-foreground/30"
             )}
           >
             <div className="space-y-2 mb-3">
               <div className="flex items-start gap-2">
-                <div className="w-6 h-6 rounded-full bg-[#222]" />
+                <div className="w-6 h-6 rounded-full bg-secondary" />
                 <div className="flex-1">
-                  <div className="h-2.5 w-16 bg-[#222] rounded mb-1" />
-                  <div className="h-2 w-24 bg-[#1a1a1a] rounded" />
+                  <div className="h-2.5 w-16 bg-secondary rounded mb-1" />
+                  <div className="h-2 w-24 bg-border rounded" />
                 </div>
               </div>
             </div>
             <span className="text-sm text-foreground">Компактный</span>
           </button>
-          
-          <button 
+
+          <button
             onClick={() => handleMessageDisplayChange("cozy")}
             className={cn(
               "p-4 rounded-lg border-2 transition-all",
               messageDisplay === "cozy"
-                ? "border-primary bg-[#141414]"
-                : "border-[#1a1a1a] bg-[#141414]/50 hover:border-[#222]"
+                ? "border-primary bg-card"
+                : "border-border bg-card/50 hover:border-muted-foreground/30"
             )}
           >
             <div className="space-y-2 mb-3">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#222]" />
+                <div className="w-8 h-8 rounded-full bg-secondary" />
                 <div className="flex-1">
-                  <div className="h-3 w-20 bg-[#222] rounded mb-2" />
-                  <div className="h-2 w-full bg-[#1a1a1a] rounded mb-1" />
-                  <div className="h-2 w-3/4 bg-[#1a1a1a] rounded" />
+                  <div className="h-3 w-20 bg-secondary rounded mb-2" />
+                  <div className="h-2 w-full bg-border rounded mb-1" />
+                  <div className="h-2 w-3/4 bg-border rounded" />
                 </div>
               </div>
             </div>

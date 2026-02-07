@@ -15,7 +15,7 @@ export function NavigationAction() {
             onClick={() => onOpen("createServer")}
             className="group flex items-center"
           >
-            <div className="flex mx-3 h-[48px] w-[48px] rounded-[24px] group-hover:rounded-[16px] transition-all overflow-hidden items-center justify-center bg-channel-sidebar group-hover:bg-emerald-500 text-emerald-500 group-hover:text-white">
+            <div className="flex mx-3 h-[48px] w-[48px] rounded-[24px] group-hover:rounded-[16px] transition-all overflow-hidden items-center justify-center bg-[#111111] group-hover:bg-acid/15 text-acid/50 group-hover:text-acid">
               <Plus className="transition" size={25} />
             </div>
           </button>

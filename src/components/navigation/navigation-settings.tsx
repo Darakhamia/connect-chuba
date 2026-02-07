@@ -13,7 +13,7 @@ export function NavigationSettings() {
         <TooltipTrigger asChild>
           <button
             onClick={() => router.push("/settings")}
-            className="flex items-center justify-center w-12 h-12 rounded-full bg-zinc-700 hover:bg-primary hover:rounded-[16px] transition-all duration-200 text-zinc-400 hover:text-white mb-3"
+            className="flex items-center justify-center w-12 h-12 rounded-full bg-[#1a1a1a] hover:bg-primary hover:rounded-[16px] transition-all duration-200 text-[#555] hover:text-foreground mb-3"
           >
             <Settings className="w-5 h-5" />
           </button>

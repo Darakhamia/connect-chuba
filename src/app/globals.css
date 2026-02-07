@@ -4,8 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ==========================================
-   Connect Chuba - Custom Theme System
-   Discord-inspired with customizable accent colors
+   ECHO — Acid Green Cyberpunk Theme
    ========================================== */
 
 @theme inline {
@@ -13,8 +12,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  
-  /* Sidebar colors */
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -23,15 +21,13 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
-  
-  /* Chart colors */
+
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
-  
-  /* Core UI colors */
+
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -48,8 +44,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  
-  /* Radius */
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -57,183 +52,132 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
-  
-  /* Custom Discord-like colors */
-  --color-discord-blurple: var(--discord-blurple);
-  --color-discord-green: var(--discord-green);
-  --color-discord-yellow: var(--discord-yellow);
-  --color-discord-fuchsia: var(--discord-fuchsia);
-  --color-discord-red: var(--discord-red);
-  
-  /* Server sidebar specific */
+
+  --color-discord-blurple: var(--accent-color);
+  --color-discord-green: var(--accent-color);
+  --color-discord-yellow: #facc15;
+  --color-discord-fuchsia: #d946ef;
+  --color-discord-red: #ff3c3c;
+
   --color-server-sidebar: var(--server-sidebar);
   --color-channel-sidebar: var(--channel-sidebar);
   --color-chat-area: var(--chat-area);
   --color-chat-input: var(--chat-input);
   --color-user-panel: var(--user-panel);
 
-  /* Chuba minimalist colors */
-  --color-chuba-dark: #0a0a0a;
-  --color-chuba-grey: #1a1a1a;
-  --color-chuba-grey-light: #2a2a2a;
-  --color-chuba-accent: #2563eb;
-  --color-chuba-accent-hover: #1d4ed8;
-  --color-chuba-text: #e5e5e5;
-  --color-chuba-text-muted: #a1a1a1;
-  --color-chuba-border: #333333;
+  --color-acid: #39ff14;
+  --color-acid-dim: #2dd10f;
+  --color-acid-glow: rgba(57, 255, 20, 0.12);
+  --color-acid-subtle: rgba(57, 255, 20, 0.06);
 
-  /* Chuba animations */
-  --animate-fade-in: fadeIn 0.2s ease-in;
+  --animate-fade-in: fadeIn 0.2s ease-out;
   --animate-slide-up: slideUp 0.3s ease-out;
   --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* ==========================================
-   Light Theme (Clean & Modern)
+   Base Theme — Always Dark, Acid Green
    ========================================== */
 :root {
-  --radius: 0.5rem;
-  
-  /* Customizable accent color */
-  --accent-color: #5865f2;
-  
-  /* Chat font size */
+  --radius: 0.625rem;
+  --accent-color: #39ff14;
   --chat-font-size: 14px;
-  
-  /* Base colors */
-  --background: #ffffff;
-  --foreground: #2e3338;
-  
-  /* Card & Popover */
-  --card: #ffffff;
-  --card-foreground: #2e3338;
-  --popover: #ffffff;
-  --popover-foreground: #2e3338;
-  
-  /* Primary - Brand color (uses accent-color) */
-  --primary: var(--accent-color);
-  --primary-foreground: #ffffff;
-  
-  /* Secondary */
-  --secondary: #f2f3f5;
-  --secondary-foreground: #2e3338;
-  
-  /* Muted */
-  --muted: #f2f3f5;
-  --muted-foreground: #6d6f78;
-  
-  /* Accent */
-  --accent: var(--accent-color);
-  --accent-foreground: #ffffff;
-  
-  /* Destructive */
-  --destructive: #ed4245;
-  
-  /* Border & Input */
-  --border: #e3e5e8;
-  --input: #e3e5e8;
-  --ring: var(--accent-color);
-  
-  /* Discord brand colors */
-  --discord-blurple: #5865f2;
-  --discord-green: #57f287;
-  --discord-yellow: #fee75c;
-  --discord-fuchsia: #eb459e;
-  --discord-red: #ed4245;
-  
-  /* Layout specific colors */
-  --server-sidebar: #e3e5e8;
-  --channel-sidebar: #f2f3f5;
-  --chat-area: #ffffff;
-  --chat-input: #ebedef;
-  --user-panel: #ebedef;
-  
-  /* Sidebar */
-  --sidebar: #f2f3f5;
-  --sidebar-foreground: #2e3338;
-  --sidebar-primary: #5865f2;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e3e5e8;
-  --sidebar-accent-foreground: #2e3338;
-  --sidebar-border: #d4d7dc;
-  --sidebar-ring: #5865f2;
-  
-  /* Charts */
-  --chart-1: #5865f2;
-  --chart-2: #57f287;
-  --chart-3: #fee75c;
-  --chart-4: #eb459e;
-  --chart-5: #ed4245;
+
+  --background: #0a0a0a;
+  --foreground: #d4d4d4;
+
+  --card: #111111;
+  --card-foreground: #d4d4d4;
+  --popover: #0e0e0e;
+  --popover-foreground: #d4d4d4;
+
+  --primary: #39ff14;
+  --primary-foreground: #000000;
+
+  --secondary: #141414;
+  --secondary-foreground: #d4d4d4;
+
+  --muted: #141414;
+  --muted-foreground: #525252;
+
+  --accent: #39ff14;
+  --accent-foreground: #000000;
+
+  --destructive: #ff3c3c;
+
+  --border: #1a1a1a;
+  --input: #111111;
+  --ring: #39ff14;
+
+  --server-sidebar: #050505;
+  --channel-sidebar: #0a0a0a;
+  --chat-area: #0e0e0e;
+  --chat-input: #111111;
+  --user-panel: #080808;
+
+  --sidebar: #0a0a0a;
+  --sidebar-foreground: #d4d4d4;
+  --sidebar-primary: #39ff14;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #151515;
+  --sidebar-accent-foreground: #d4d4d4;
+  --sidebar-border: #1a1a1a;
+  --sidebar-ring: #39ff14;
+
+  --chart-1: #39ff14;
+  --chart-2: #00e5ff;
+  --chart-3: #facc15;
+  --chart-4: #d946ef;
+  --chart-5: #ff3c3c;
 }
 
-/* ==========================================
-   Dark Theme (Discord-inspired)
-   ========================================== */
 .dark {
-  /* Base colors */
-  --background: #313338;
-  --foreground: #dbdee1;
-  
-  /* Card & Popover */
-  --card: #2b2d31;
-  --card-foreground: #dbdee1;
-  --popover: #1e1f22;
-  --popover-foreground: #dbdee1;
-  
-  /* Primary - Brand color (uses accent-color) */
-  --primary: var(--accent-color);
-  --primary-foreground: #ffffff;
-  
-  /* Secondary */
-  --secondary: #2b2d31;
-  --secondary-foreground: #dbdee1;
-  
-  /* Muted */
-  --muted: #2b2d31;
-  --muted-foreground: #949ba4;
-  
-  /* Accent */
-  --accent: var(--accent-color);
-  --accent-foreground: #ffffff;
-  
-  /* Destructive */
-  --destructive: #f23f42;
-  
-  /* Border & Input */
-  --border: #3f4147;
-  --input: #1e1f22;
-  --ring: var(--accent-color);
-  
-  /* Discord brand colors (same in both themes) */
-  --discord-blurple: #5865f2;
-  --discord-green: #23a55a;
-  --discord-yellow: #f0b132;
-  --discord-fuchsia: #eb459e;
-  --discord-red: #f23f42;
-  
-  /* Layout specific colors */
-  --server-sidebar: #1e1f22;
-  --channel-sidebar: #2b2d31;
-  --chat-area: #313338;
-  --chat-input: #383a40;
-  --user-panel: #232428;
-  
-  /* Sidebar */
-  --sidebar: #2b2d31;
-  --sidebar-foreground: #f2f3f5;
-  --sidebar-primary: #5865f2;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #35373c;
-  --sidebar-accent-foreground: #dbdee1;
-  --sidebar-border: #3f4147;
-  --sidebar-ring: #5865f2;
-  
-  /* Charts */
-  --chart-1: #5865f2;
-  --chart-2: #23a55a;
-  --chart-3: #f0b132;
-  --chart-4: #eb459e;
-  --chart-5: #f23f42;
+  --background: #0a0a0a;
+  --foreground: #d4d4d4;
+
+  --card: #111111;
+  --card-foreground: #d4d4d4;
+  --popover: #0e0e0e;
+  --popover-foreground: #d4d4d4;
+
+  --primary: #39ff14;
+  --primary-foreground: #000000;
+
+  --secondary: #141414;
+  --secondary-foreground: #d4d4d4;
+
+  --muted: #141414;
+  --muted-foreground: #525252;
+
+  --accent: #39ff14;
+  --accent-foreground: #000000;
+
+  --destructive: #ff3c3c;
+
+  --border: #1a1a1a;
+  --input: #111111;
+  --ring: #39ff14;
+
+  --server-sidebar: #050505;
+  --channel-sidebar: #0a0a0a;
+  --chat-area: #0e0e0e;
+  --chat-input: #111111;
+  --user-panel: #080808;
+
+  --sidebar: #0a0a0a;
+  --sidebar-foreground: #d4d4d4;
+  --sidebar-primary: #39ff14;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #151515;
+  --sidebar-accent-foreground: #d4d4d4;
+  --sidebar-border: #1a1a1a;
+  --sidebar-ring: #39ff14;
+
+  --chart-1: #39ff14;
+  --chart-2: #00e5ff;
+  --chart-3: #facc15;
+  --chart-4: #d946ef;
+  --chart-5: #ff3c3c;
 }
 
 /* ==========================================
@@ -243,103 +187,99 @@
   * {
     @apply border-border outline-ring/50;
   }
-  
+
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-  
-  /* Custom scrollbar for dark mode */
-  .dark ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
   }
-  
-  .dark ::-webkit-scrollbar-track {
+
+  ::-webkit-scrollbar-track {
     background: transparent;
   }
-  
-  .dark ::-webkit-scrollbar-thumb {
-    background: #1e1f22;
-    border-radius: 4px;
+
+  ::-webkit-scrollbar-thumb {
+    background: #1a1a1a;
+    border-radius: 3px;
   }
-  
-  .dark ::-webkit-scrollbar-thumb:hover {
-    background: #3f4147;
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2a2a2a;
+  }
+
+  ::selection {
+    background: rgba(57, 255, 20, 0.2);
+    color: #e0e0e0;
   }
 }
 
 /* ==========================================
-   Custom Utility Classes
+   Utilities
    ========================================== */
 @layer utilities {
-  /* Discord-like hover effects */
   .server-icon-hover {
     @apply transition-all duration-200 ease-out;
   }
-  
+
   .server-icon-hover:hover {
     border-radius: 35%;
   }
-  
-  /* Pill indicator for active server */
+
   .server-pill {
-    @apply absolute left-0 bg-foreground rounded-r-full transition-all duration-200;
+    @apply absolute left-0 bg-acid rounded-r-full transition-all duration-200;
   }
-  
-  /* Channel hover effect */
+
   .channel-hover {
     @apply transition-colors duration-150;
   }
-  
+
   .channel-hover:hover {
     @apply bg-sidebar-accent;
   }
-  
-  /* Flex utilities */
+
   .flex-center {
     @apply flex items-center justify-center;
+  }
+
+  .glow-acid {
+    box-shadow: 0 0 14px rgba(57, 255, 20, 0.25), 0 0 4px rgba(57, 255, 20, 0.1);
+  }
+
+  .glow-acid-sm {
+    box-shadow: 0 0 8px rgba(57, 255, 20, 0.2);
+  }
+
+  .glow-acid-text {
+    text-shadow: 0 0 12px rgba(57, 255, 20, 0.5);
   }
 }
 
 /* ==========================================
-   Animation Keyframes
+   Animations
    ========================================== */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideIn {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
 }
 
 @keyframes slideUp {
-  0% { transform: translateY(10px); opacity: 0; }
+  0% { transform: translateY(8px); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
 }
 
 @keyframes pulse-ring {
-  0% {
-    box-shadow: 0 0 0 0 var(--discord-blurple);
-  }
-  70% {
-    box-shadow: 0 0 0 8px transparent;
-  }
-  100% {
-    box-shadow: 0 0 0 0 transparent;
-  }
+  0% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0.4); }
+  70% { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
 }
 
 .animate-fade-in {

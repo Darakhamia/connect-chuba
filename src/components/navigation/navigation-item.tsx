@@ -27,7 +27,7 @@ export function NavigationItem({ id, name, imageUrl }: NavigationItemProps) {
             {/* Индикатор активного сервера */}
             <div
               className={cn(
-                "absolute left-0 bg-foreground rounded-r-full transition-all w-[4px]",
+                "absolute left-0 bg-acid rounded-r-full transition-all w-[4px]",
                 params?.serverId !== id && "group-hover:h-[20px]",
                 params?.serverId === id ? "h-[36px]" : "h-[8px]"
               )}

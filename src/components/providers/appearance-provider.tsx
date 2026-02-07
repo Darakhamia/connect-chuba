@@ -4,17 +4,16 @@ import { useEffect } from "react";
 import { useSettings } from "@/hooks/use-settings-store";
 
 const accentColors: Record<string, string> = {
-  indigo: "#5865f2",
+  acid: "#39ff14",
   green: "#3ba55c",
-  yellow: "#faa61a",
-  red: "#ed4245",
-  pink: "#eb459e",
+  cyan: "#00e5ff",
+  yellow: "#facc15",
+  red: "#ff3c3c",
+  pink: "#d946ef",
   purple: "#9b59b6",
-  cyan: "#00aff4",
   orange: "#e67e22",
 };
 
-// Background themes
 const backgroundThemes: Record<string, {
   background: string;
   serverSidebar: string;
@@ -24,36 +23,36 @@ const backgroundThemes: Record<string, {
   popover: string;
 }> = {
   dark: {
-    background: "#313338",
-    serverSidebar: "#1e1f22",
-    channelSidebar: "#2b2d31",
-    chatArea: "#313338",
-    userPanel: "#232428",
-    popover: "#1e1f22",
+    background: "#0a0a0a",
+    serverSidebar: "#050505",
+    channelSidebar: "#0a0a0a",
+    chatArea: "#0e0e0e",
+    userPanel: "#080808",
+    popover: "#0e0e0e",
   },
   darker: {
-    background: "#1a1a1d",
-    serverSidebar: "#0d0d0f",
-    channelSidebar: "#141417",
-    chatArea: "#1a1a1d",
-    userPanel: "#101013",
-    popover: "#0d0d0f",
+    background: "#050505",
+    serverSidebar: "#020202",
+    channelSidebar: "#050505",
+    chatArea: "#080808",
+    userPanel: "#030303",
+    popover: "#080808",
   },
   midnight: {
-    background: "#0e1525",
-    serverSidebar: "#040810",
-    channelSidebar: "#081020",
-    chatArea: "#0e1525",
-    userPanel: "#060c18",
-    popover: "#040810",
+    background: "#0a0e1a",
+    serverSidebar: "#04060e",
+    channelSidebar: "#070b15",
+    chatArea: "#0a0e1a",
+    userPanel: "#050812",
+    popover: "#070b15",
   },
   amoled: {
     background: "#000000",
     serverSidebar: "#000000",
-    channelSidebar: "#0a0a0a",
+    channelSidebar: "#050505",
     chatArea: "#000000",
-    userPanel: "#050505",
-    popover: "#0a0a0a",
+    userPanel: "#000000",
+    popover: "#050505",
   },
 };
 
@@ -61,19 +60,14 @@ export function AppearanceProvider({ children }: { children: React.ReactNode }) 
   const { accentColor, backgroundColor, fontSize } = useSettings();
 
   useEffect(() => {
-    // Apply accent color
-    const color = accentColors[accentColor] || accentColors.indigo;
+    const color = accentColors[accentColor] || accentColors.acid;
     document.documentElement.style.setProperty("--accent-color", color);
-    
-    // Apply to primary colors
     document.documentElement.style.setProperty("--primary", color);
     document.documentElement.style.setProperty("--accent", color);
     document.documentElement.style.setProperty("--ring", color);
-    
-    // Apply font size
+
     document.documentElement.style.setProperty("--chat-font-size", `${fontSize}px`);
-    
-    // Apply background theme
+
     const theme = backgroundThemes[backgroundColor] || backgroundThemes.dark;
     document.documentElement.style.setProperty("--background", theme.background);
     document.documentElement.style.setProperty("--server-sidebar", theme.serverSidebar);
@@ -81,7 +75,7 @@ export function AppearanceProvider({ children }: { children: React.ReactNode }) 
     document.documentElement.style.setProperty("--chat-area", theme.chatArea);
     document.documentElement.style.setProperty("--user-panel", theme.userPanel);
     document.documentElement.style.setProperty("--popover", theme.popover);
-    
+
   }, [accentColor, backgroundColor, fontSize]);
 
   return <>{children}</>;

@@ -54,7 +54,7 @@ export function DMSidebar({ profile }: DMSidebarProps) {
     <div className="w-60 h-full bg-channel-sidebar flex flex-col">
       {/* Search */}
       <div className="p-2">
-        <button className="w-full h-7 px-2 rounded bg-zinc-900 text-zinc-500 text-sm text-left">
+        <button className="w-full h-7 px-2 rounded bg-[#111111] text-[#444] text-sm text-left">
           Найти или начать беседу
         </button>
       </div>
@@ -66,8 +66,8 @@ export function DMSidebar({ profile }: DMSidebarProps) {
           className={cn(
             "w-full flex items-center gap-3 px-2 py-2 rounded transition-colors",
             isHome && !isDM
-              ? "bg-accent/20 text-white"
-              : "text-zinc-400 hover:bg-zinc-700/30 hover:text-zinc-200"
+              ? "bg-accent/20 text-foreground"
+              : "text-[#555] hover:bg-[#1a1a1a]/30 hover:text-zinc-200"
           )}
         >
           <Users className="w-5 h-5" />
@@ -75,14 +75,14 @@ export function DMSidebar({ profile }: DMSidebarProps) {
         </button>
       </div>
 
-      <div className="h-[1px] bg-zinc-700 mx-2 my-2" />
+      <div className="h-[1px] bg-[#1a1a1a] mx-2 my-2" />
 
       {/* DM header */}
       <div className="px-4 py-1 flex items-center justify-between">
-        <span className="text-xs font-semibold text-zinc-400 uppercase">
+        <span className="text-xs font-semibold text-[#555] uppercase">
           Личные сообщения
         </span>
-        <button className="text-zinc-400 hover:text-white">
+        <button className="text-[#555] hover:text-foreground">
           <Plus className="w-4 h-4" />
         </button>
       </div>
@@ -90,7 +90,7 @@ export function DMSidebar({ profile }: DMSidebarProps) {
       {/* DM list */}
       <div className="flex-1 px-2 py-2 overflow-y-auto">
         {dmConversations.length === 0 ? (
-          <p className="text-xs text-zinc-500 text-center py-4">
+          <p className="text-xs text-[#444] text-center py-4">
             Пока нет бесед
           </p>
         ) : (
@@ -102,28 +102,28 @@ export function DMSidebar({ profile }: DMSidebarProps) {
                 className={cn(
                   "w-full flex items-center gap-3 px-2 py-2 rounded transition-colors group",
                   currentDMId === conv.id
-                    ? "bg-accent/20 text-white"
-                    : "hover:bg-zinc-700/50"
+                    ? "bg-accent/20 text-foreground"
+                    : "hover:bg-[#1a1a1a]/50"
                 )}
               >
                 <div className="relative">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={conv.profile.imageUrl} />
-                    <AvatarFallback className="bg-primary text-white text-xs">
+                    <AvatarFallback className="bg-primary text-foreground text-xs">
                       {conv.profile.name.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-channel-sidebar" />
+                  <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-acid border-2 border-channel-sidebar" />
                 </div>
                 <div className="flex-1 min-w-0 text-left">
                   <p className={cn(
                     "text-sm font-medium truncate",
-                    currentDMId === conv.id ? "text-white" : "text-zinc-300 group-hover:text-white"
+                    currentDMId === conv.id ? "text-foreground" : "text-[#999] group-hover:text-foreground"
                   )}>
                     {conv.profile.name}
                   </p>
                   {conv.lastMessage && (
-                    <p className="text-xs text-zinc-500 truncate">
+                    <p className="text-xs text-[#444] truncate">
                       {conv.lastMessage.content}
                     </p>
                   )}

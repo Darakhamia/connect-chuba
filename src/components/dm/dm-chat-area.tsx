@@ -87,18 +87,18 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#313338]">
+    <div className="flex flex-col h-full bg-[#0e0e0e]">
       {/* Header */}
-      <div className="h-12 border-b border-zinc-700 flex items-center justify-between px-4">
+      <div className="h-12 border-b border-[#1a1a1a] flex items-center justify-between px-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8">
             <AvatarImage src={otherProfile.imageUrl} />
-            <AvatarFallback className="bg-indigo-500 text-white text-xs">
+            <AvatarFallback className="bg-acid/20 text-foreground text-xs">
               {otherProfile.name.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-semibold text-white text-sm">{otherProfile.name}</p>
+            <p className="font-semibold text-foreground text-sm">{otherProfile.name}</p>
             <p className="text-xs text-green-500">В сети</p>
           </div>
         </div>
@@ -118,7 +118,7 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="text-zinc-400 hover:text-white"
+                className="text-[#555] hover:text-foreground"
                 onClick={() => {
                   setIsVideoCall(false);
                   setIsInCall(true);
@@ -130,7 +130,7 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="text-zinc-400 hover:text-white"
+                className="text-[#555] hover:text-foreground"
                 onClick={() => {
                   setIsVideoCall(true);
                   setIsInCall(true);
@@ -141,7 +141,7 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
               </Button>
             </>
           )}
-          <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white">
+          <Button variant="ghost" size="icon" className="text-[#555] hover:text-foreground">
             <MoreVertical className="h-5 w-5" />
           </Button>
         </div>
@@ -166,12 +166,12 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
           <div className="text-center py-8">
             <Avatar className="h-20 w-20 mx-auto mb-4">
               <AvatarImage src={otherProfile.imageUrl} />
-              <AvatarFallback className="bg-indigo-500 text-white text-2xl">
+              <AvatarFallback className="bg-acid/20 text-foreground text-2xl">
                 {otherProfile.name.slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <h2 className="text-2xl font-bold text-white">{otherProfile.name}</h2>
-            <p className="text-zinc-400 mt-1">
+            <h2 className="text-2xl font-bold text-foreground">{otherProfile.name}</h2>
+            <p className="text-[#555] mt-1">
               Это начало вашей беседы с {otherProfile.name}
             </p>
           </div>
@@ -189,7 +189,7 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
                 {showAvatar ? (
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={message.profile.imageUrl} />
-                    <AvatarFallback className="bg-indigo-500 text-white text-xs">
+                    <AvatarFallback className="bg-acid/20 text-foreground text-xs">
                       {message.profile.name.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -200,15 +200,15 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
                 <div className="flex-1">
                   {showAvatar && (
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-white text-sm">
+                      <span className="font-semibold text-foreground text-sm">
                         {message.profile.name}
                       </span>
-                      <span className="text-xs text-zinc-500">
+                      <span className="text-xs text-[#444]">
                         {format(new Date(message.createdAt), "dd MMM, HH:mm", { locale: ru })}
                       </span>
                     </div>
                   )}
-                  <p className="text-zinc-300">{message.content}</p>
+                  <p className="text-[#999]">{message.content}</p>
                 </div>
               </div>
             );
@@ -229,7 +229,7 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
               apiUrl: `/api/dm/${conversationId}/messages`,
               query: {}
             })}
-            className="text-zinc-400 hover:text-white transition"
+            className="text-[#555] hover:text-foreground transition"
             title="Прикрепить файл"
           >
             <Plus className="h-6 w-6" />
@@ -239,7 +239,7 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder={`Написать ${otherProfile.name}`}
-            className="flex-1 bg-transparent border-0 focus-visible:ring-0 text-white placeholder:text-zinc-500"
+            className="flex-1 bg-transparent border-0 focus-visible:ring-0 text-foreground placeholder:text-[#444]"
             disabled={isLoading}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -253,7 +253,7 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
           
           <button 
             type="button" 
-            className="text-zinc-400 hover:text-white transition"
+            className="text-[#555] hover:text-foreground transition"
             title="Эмодзи (скоро)"
           >
             <Smile className="h-6 w-6" />

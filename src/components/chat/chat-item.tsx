@@ -38,7 +38,7 @@ interface ChatItemProps {
 
 const roleIconMap = {
   GUEST: null,
-  MODERATOR: <ShieldCheck className="h-4 w-4 ml-2 text-indigo-500" />,
+  MODERATOR: <ShieldCheck className="h-4 w-4 ml-2 text-acid" />,
   ADMIN: <ShieldAlert className="h-4 w-4 ml-2 text-rose-500" />,
 };
 
@@ -218,7 +218,7 @@ export function ChatItem({
                 href={fileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="ml-2 text-sm text-indigo-500 dark:text-indigo-400 hover:underline"
+                className="ml-2 text-sm text-acid dark:text-acid/70 hover:underline"
               >
                 PDF файл
               </a>
@@ -258,7 +258,7 @@ export function ChatItem({
                         <div className="relative w-full">
                           <Input
                             disabled={isLoading}
-                            className="p-2 bg-zinc-200/90 dark:bg-zinc-700/75 border-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-600 dark:text-zinc-200"
+                            className="p-2 bg-foreground/90 dark:bg-[#1a1a1a]/75 border-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-[#222] dark:text-foreground"
                             placeholder="Изменённое сообщение"
                             {...field}
                           />
@@ -281,7 +281,7 @@ export function ChatItem({
 
       {/* Кнопки действий */}
       {!deleted && (
-        <div className="hidden group-hover:flex items-center gap-x-2 absolute p-1 -top-2 right-5 bg-white dark:bg-zinc-800 border rounded-sm">
+        <div className="hidden group-hover:flex items-center gap-x-2 absolute p-1 -top-2 right-5 bg-white dark:bg-[#141414] border rounded-sm">
           {/* Реакции */}
           <TooltipProvider>
             <Tooltip delayDuration={50}>
@@ -292,7 +292,7 @@ export function ChatItem({
                     className="cursor-pointer w-4 h-4 text-muted-foreground hover:text-foreground transition"
                   />
                   {showReactionPicker && (
-                    <div className="absolute top-6 right-0 bg-white dark:bg-zinc-800 border rounded-md p-2 flex gap-1 z-50">
+                    <div className="absolute top-6 right-0 bg-white dark:bg-[#141414] border rounded-md p-2 flex gap-1 z-50">
                       {["👍", "❤️", "😂", "😮", "😢", "🔥", "✨", "🎉"].map((emoji) => (
                         <button
                           key={emoji}

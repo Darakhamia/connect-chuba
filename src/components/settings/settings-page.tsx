@@ -49,20 +49,20 @@ export function SettingsPage({ profile }: SettingsPageProps) {
   };
 
   return (
-    <div className="h-full flex bg-[#313338]">
+    <div className="h-full flex bg-[#0e0e0e]">
       {/* Sidebar */}
-      <div className="w-[232px] bg-[#2b2d31] flex flex-col">
+      <div className="w-[232px] bg-[#0a0a0a] flex flex-col">
         <div className="flex-1 p-2">
           {/* Back button on mobile */}
           <button
             onClick={handleClose}
-            className="md:hidden flex items-center gap-2 text-zinc-400 hover:text-white p-2 mb-2"
+            className="md:hidden flex items-center gap-2 text-[#555] hover:text-foreground p-2 mb-2"
           >
             <ChevronLeft className="w-5 h-5" />
             Назад
           </button>
 
-          <div className="px-2 py-1.5 text-xs font-semibold text-zinc-400 uppercase">
+          <div className="px-2 py-1.5 text-xs font-semibold text-[#555] uppercase">
             Настройки пользователя
           </div>
 
@@ -77,8 +77,8 @@ export function SettingsPage({ profile }: SettingsPageProps) {
                   className={cn(
                     "w-full flex items-center gap-3 px-2 py-1.5 rounded text-sm transition-colors",
                     activeTab === tab.id
-                      ? "bg-zinc-700/50 text-white"
-                      : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700/30"
+                      ? "bg-[#1a1a1a]/50 text-foreground"
+                      : "text-[#555] hover:text-foreground hover:bg-[#1a1a1a]/30"
                   )}
                 >
                   <Icon className="w-4 h-4" />
@@ -88,12 +88,12 @@ export function SettingsPage({ profile }: SettingsPageProps) {
             })}
           </nav>
 
-          <div className="h-[1px] bg-zinc-700 my-2" />
+          <div className="h-[1px] bg-[#1a1a1a] my-2" />
 
           {/* Sign out */}
           <button
             onClick={handleSignOut}
-            className="w-full flex items-center gap-3 px-2 py-1.5 rounded text-sm text-zinc-400 hover:text-red-400 hover:bg-zinc-700/30 transition-colors"
+            className="w-full flex items-center gap-3 px-2 py-1.5 rounded text-sm text-[#555] hover:text-red-400 hover:bg-[#1a1a1a]/30 transition-colors"
           >
             <LogOut className="w-4 h-4" />
             Выйти
@@ -101,14 +101,14 @@ export function SettingsPage({ profile }: SettingsPageProps) {
         </div>
 
         {/* User info at bottom */}
-        <div className="p-2 border-t border-zinc-700">
-          <div className="flex items-center gap-2 p-2 rounded bg-zinc-800/50">
-            <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-sm font-semibold">
+        <div className="p-2 border-t border-[#1a1a1a]">
+          <div className="flex items-center gap-2 p-2 rounded bg-[#141414]/50">
+            <div className="w-8 h-8 rounded-full bg-acid/20 flex items-center justify-center text-foreground text-sm font-semibold">
               {profile.name.slice(0, 2).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{profile.name}</p>
-              <p className="text-xs text-zinc-400 truncate">Online</p>
+              <p className="text-sm font-medium text-foreground truncate">{profile.name}</p>
+              <p className="text-xs text-[#555] truncate">Online</p>
             </div>
           </div>
         </div>
@@ -117,15 +117,15 @@ export function SettingsPage({ profile }: SettingsPageProps) {
       {/* Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="h-12 flex items-center justify-between px-4 border-b border-zinc-700">
-          <h1 className="text-lg font-semibold text-white">
+        <div className="h-12 flex items-center justify-between px-4 border-b border-[#1a1a1a]">
+          <h1 className="text-lg font-semibold text-foreground">
             {tabs.find(t => t.id === activeTab)?.label}
           </h1>
           <Button
             variant="ghost"
             size="icon"
             onClick={handleClose}
-            className="text-zinc-400 hover:text-white"
+            className="text-[#555] hover:text-foreground"
           >
             <X className="w-5 h-5" />
           </Button>
@@ -139,7 +139,7 @@ export function SettingsPage({ profile }: SettingsPageProps) {
             {activeTab === "voice" && <VoiceSettings />}
             {activeTab === "notifications" && <NotificationSettings />}
             {activeTab === "privacy" && (
-              <div className="text-zinc-400">
+              <div className="text-[#555]">
                 <p>Настройки конфиденциальности скоро появятся...</p>
               </div>
             )}

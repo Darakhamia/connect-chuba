@@ -109,7 +109,7 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
         <div className="relative group">
           <Avatar className="w-24 h-24">
             <AvatarImage src={imageUrl} />
-            <AvatarFallback className="bg-indigo-500 text-2xl text-white">
+            <AvatarFallback className="bg-acid/20 text-2xl text-foreground">
               {profile.name.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -117,17 +117,17 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
             onClick={() => setIsAvatarDialogOpen(true)}
             className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
           >
-            <Camera className="w-6 h-6 text-white" />
+            <Camera className="w-6 h-6 text-foreground" />
           </button>
         </div>
         
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-white mb-1">{profile.name}</h3>
-          <p className="text-sm text-zinc-400 mb-3">{profile.email}</p>
+          <h3 className="text-lg font-semibold text-foreground mb-1">{profile.name}</h3>
+          <p className="text-sm text-[#555] mb-3">{profile.email}</p>
           <Button 
             variant="outline" 
             size="sm" 
-            className="border-zinc-600"
+            className="border-[#222]"
             onClick={() => setIsAvatarDialogOpen(true)}
           >
             Изменить аватар
@@ -137,9 +137,9 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
 
       {/* Avatar upload dialog */}
       <Dialog open={isAvatarDialogOpen} onOpenChange={setIsAvatarDialogOpen}>
-        <DialogContent className="bg-zinc-900 border-zinc-700">
+        <DialogContent className="bg-[#111111] border-[#1a1a1a]">
           <DialogHeader>
-            <DialogTitle className="text-white">Изменить аватар</DialogTitle>
+            <DialogTitle className="text-foreground">Изменить аватар</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="flex justify-center">
@@ -149,67 +149,67 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
                 onChange={handleAvatarChange}
               />
             </div>
-            <p className="text-xs text-zinc-500 text-center">
+            <p className="text-xs text-[#444] text-center">
               Рекомендуемый размер: 128x128 пикселей
             </p>
           </div>
         </DialogContent>
       </Dialog>
 
-      <div className="h-[1px] bg-zinc-700" />
+      <div className="h-[1px] bg-[#1a1a1a]" />
 
       {/* Form */}
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="name" className="text-zinc-300">Имя пользователя</Label>
+          <Label htmlFor="name" className="text-[#999]">Имя пользователя</Label>
           <Input
             id="name"
             value={name}
             onChange={(e) => handleNameChange(e.target.value)}
-            className="bg-zinc-900 border-zinc-700 text-white"
+            className="bg-[#111111] border-[#1a1a1a] text-foreground"
             placeholder="Ваше имя"
             maxLength={32}
           />
-          <p className="text-xs text-zinc-500">{name.length}/32</p>
+          <p className="text-xs text-[#444]">{name.length}/32</p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="bio" className="text-zinc-300">О себе</Label>
+          <Label htmlFor="bio" className="text-[#999]">О себе</Label>
           <textarea
             id="bio"
             value={bio}
             onChange={(e) => handleBioChange(e.target.value)}
-            className="w-full h-24 px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-md text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+            className="w-full h-24 px-3 py-2 bg-[#111111] border border-[#1a1a1a] rounded-md text-foreground placeholder:text-[#444] focus:outline-none focus:ring-2 focus:ring-primary resize-none"
             placeholder="Расскажите немного о себе..."
             maxLength={190}
           />
-          <p className="text-xs text-zinc-500">{bio.length}/190</p>
+          <p className="text-xs text-[#444]">{bio.length}/190</p>
         </div>
 
         <div className="space-y-2">
-          <Label className="text-zinc-300">Email</Label>
+          <Label className="text-[#999]">Email</Label>
           <Input
             value={profile.email}
             disabled
-            className="bg-zinc-900 border-zinc-700 text-zinc-500"
+            className="bg-[#111111] border-[#1a1a1a] text-[#444]"
           />
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-[#444]">
             Email связан с вашим аккаунтом и не может быть изменён
           </p>
         </div>
 
         <div className="space-y-2">
-          <Label className="text-zinc-300">ID для друзей</Label>
+          <Label className="text-[#999]">ID для друзей</Label>
           <div className="flex gap-2">
             <Input
               value={profile.id}
               disabled
-              className="bg-zinc-900 border-zinc-700 text-zinc-400 font-mono text-xs"
+              className="bg-[#111111] border-[#1a1a1a] text-[#555] font-mono text-xs"
             />
             <Button
               variant="outline"
               size="sm"
-              className={`shrink-0 ${copied ? "border-green-500 text-green-500" : "border-zinc-600"}`}
+              className={`shrink-0 ${copied ? "border-green-500 text-green-500" : "border-[#222]"}`}
               onClick={handleCopyId}
             >
               {copied ? (
@@ -225,13 +225,13 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
               )}
             </Button>
           </div>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-[#444]">
             Отправьте этот ID другу чтобы он мог вас добавить
           </p>
         </div>
       </div>
 
-      <div className="h-[1px] bg-zinc-700" />
+      <div className="h-[1px] bg-[#1a1a1a]" />
 
       {/* Save button */}
       <div className="flex justify-end">

@@ -24,7 +24,7 @@ const statusOptions = [
   { value: "ONLINE" as UserStatus, label: "В сети", icon: Circle, color: "text-green-500", fill: "fill-green-500" },
   { value: "IDLE" as UserStatus, label: "Не активен", icon: Moon, color: "text-yellow-500", fill: "fill-yellow-500" },
   { value: "DND" as UserStatus, label: "Не беспокоить", icon: MinusCircle, color: "text-red-500", fill: "fill-red-500" },
-  { value: "INVISIBLE" as UserStatus, label: "Невидимый", icon: EyeOff, color: "text-zinc-500", fill: "fill-zinc-500" },
+  { value: "INVISIBLE" as UserStatus, label: "Невидимый", icon: EyeOff, color: "text-[#444]", fill: "fill-zinc-500" },
 ];
 
 export function UserPanel({ profile }: UserPanelProps) {
@@ -69,14 +69,14 @@ export function UserPanel({ profile }: UserPanelProps) {
   };
 
   return (
-    <div className="p-2 bg-[#232428]">
+    <div className="p-2 bg-user-panel">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="w-full flex items-center gap-2 p-1 rounded hover:bg-zinc-700/50 transition-colors">
+          <button className="w-full flex items-center gap-2 p-1 rounded hover:bg-[#151515] transition-colors">
             <div className="relative">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={profile.imageUrl} />
-                <AvatarFallback className="bg-indigo-500 text-white text-xs">
+                <AvatarFallback className="bg-acid/20 text-foreground text-xs">
                   {profile.name.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -90,8 +90,8 @@ export function UserPanel({ profile }: UserPanelProps) {
               )} />
             </div>
             <div className="flex-1 min-w-0 text-left">
-              <p className="text-sm font-medium text-white truncate">{profile.name}</p>
-              <p className="text-xs text-zinc-400 truncate">
+              <p className="text-sm font-medium text-foreground truncate">{profile.name}</p>
+              <p className="text-xs text-[#555] truncate">
                 {profile.bio || currentStatus.label}
               </p>
             </div>
@@ -101,34 +101,34 @@ export function UserPanel({ profile }: UserPanelProps) {
         <DropdownMenuContent 
           side="top" 
           align="start" 
-          className="w-56 bg-[#111214] border-zinc-800"
+          className="w-56 bg-[#0e0e0e] border-[#1a1a1a]"
         >
           {/* User card */}
           <div className="p-3">
             <div className="flex items-center gap-3 mb-3">
               <Avatar className="h-12 w-12">
                 <AvatarImage src={profile.imageUrl} />
-                <AvatarFallback className="bg-indigo-500 text-white">
+                <AvatarFallback className="bg-acid/20 text-foreground">
                   {profile.name.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-semibold text-white">{profile.name}</p>
-                <p className="text-xs text-zinc-400">{profile.email}</p>
+                <p className="font-semibold text-foreground">{profile.name}</p>
+                <p className="text-xs text-[#555]">{profile.email}</p>
               </div>
             </div>
             {profile.bio && (
-              <p className="text-sm text-zinc-300 bg-zinc-800/50 p-2 rounded">
+              <p className="text-sm text-[#999] bg-[#111] p-2 rounded">
                 {profile.bio}
               </p>
             )}
           </div>
           
-          <DropdownMenuSeparator className="bg-zinc-800" />
+          <DropdownMenuSeparator className="bg-[#151515]" />
           
           {/* Status selection */}
           <div className="p-1">
-            <p className="px-2 py-1 text-xs font-semibold text-zinc-400 uppercase">
+            <p className="px-2 py-1 text-xs font-semibold text-[#555] uppercase">
               Статус
             </p>
             {statusOptions.map((option) => {
@@ -139,7 +139,7 @@ export function UserPanel({ profile }: UserPanelProps) {
                   onClick={() => handleStatusChange(option.value)}
                   className={cn(
                     "cursor-pointer",
-                    status === option.value && "bg-zinc-800"
+                    status === option.value && "bg-[#151515]"
                   )}
                 >
                   <Icon className={cn("w-4 h-4 mr-2", option.color, option.fill)} />
@@ -149,7 +149,7 @@ export function UserPanel({ profile }: UserPanelProps) {
             })}
           </div>
           
-          <DropdownMenuSeparator className="bg-zinc-800" />
+          <DropdownMenuSeparator className="bg-[#151515]" />
           
           {/* Settings */}
           <DropdownMenuItem
@@ -160,7 +160,7 @@ export function UserPanel({ profile }: UserPanelProps) {
             Настройки
           </DropdownMenuItem>
           
-          <DropdownMenuSeparator className="bg-zinc-800" />
+          <DropdownMenuSeparator className="bg-[#151515]" />
           
           {/* Logout */}
           <DropdownMenuItem

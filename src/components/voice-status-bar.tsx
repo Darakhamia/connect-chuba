@@ -38,16 +38,16 @@ export function VoiceStatusBar() {
         <div className="flex items-center gap-3">
           <div className={cn(
             "w-10 h-10 rounded-lg flex items-center justify-center",
-            isVideo ? "bg-indigo-500" : "bg-green-500"
+            isVideo ? "bg-acid/20" : "bg-green-500"
           )}>
             {isVideo ? (
-              <Video className="w-5 h-5 text-white" />
+              <Video className="w-5 h-5 text-foreground" />
             ) : (
-              <Mic className="w-5 h-5 text-white" />
+              <Mic className="w-5 h-5 text-foreground" />
             )}
           </div>
           <div>
-            <p className="text-sm font-semibold text-white">
+            <p className="text-sm font-semibold text-foreground">
               {activeChannelName}
             </p>
             <p className="text-xs text-muted-foreground">
@@ -62,7 +62,7 @@ export function VoiceStatusBar() {
             variant="ghost"
             size="icon"
             onClick={handleGoToChannel}
-            className="text-muted-foreground hover:text-white"
+            className="text-muted-foreground hover:text-foreground"
           >
             <Maximize2 className="w-5 h-5" />
           </Button>

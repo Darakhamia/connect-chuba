@@ -56,7 +56,7 @@ export const useSettings = create<SettingsState>()(
   persist(
     (set) => ({
       // Default values
-      accentColor: "indigo",
+      accentColor: "acid",
       backgroundColor: "dark", // dark, darker, midnight, amoled
       fontSize: 14,
       messageDisplay: "cozy",

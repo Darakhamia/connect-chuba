@@ -176,11 +176,11 @@ export function FriendsList() {
   return (
     <div className="flex-1 flex flex-col">
       {/* Header */}
-      <div className="h-12 border-b border-zinc-700 flex items-center px-4 gap-4">
-        <Users className="w-5 h-5 text-zinc-400" />
-        <span className="font-semibold text-white">Друзья</span>
+      <div className="h-12 border-b border-[#1a1a1a] flex items-center px-4 gap-4">
+        <Users className="w-5 h-5 text-[#555]" />
+        <span className="font-semibold text-foreground">Друзья</span>
         
-        <div className="h-6 w-[1px] bg-zinc-700 mx-2" />
+        <div className="h-6 w-[1px] bg-[#1a1a1a] mx-2" />
         
         {/* Tabs */}
         <div className="flex items-center gap-2">
@@ -192,11 +192,11 @@ export function FriendsList() {
                 "px-2 py-1 rounded text-sm font-medium transition-colors",
                 activeTab === tab.id
                   ? tab.isGreen
-                    ? "bg-green-600 text-white"
-                    : "bg-zinc-700 text-white"
+                    ? "bg-acid/20 text-foreground"
+                    : "bg-[#1a1a1a] text-foreground"
                   : tab.isGreen
-                    ? "text-green-500 hover:bg-zinc-700/50"
-                    : "text-zinc-400 hover:bg-zinc-700/50 hover:text-zinc-200"
+                    ? "text-acid hover:bg-[#1a1a1a]/50"
+                    : "text-[#555] hover:bg-[#1a1a1a]/50 hover:text-foreground"
               )}
             >
               {tab.label}
@@ -213,8 +213,8 @@ export function FriendsList() {
         {/* Add Friend Tab */}
         {activeTab === "add" && (
           <div className="max-w-lg">
-            <h2 className="text-xl font-bold text-white mb-2">Добавить друга</h2>
-            <p className="text-zinc-400 text-sm mb-4">
+            <h2 className="text-xl font-bold text-foreground mb-2">Добавить друга</h2>
+            <p className="text-[#555] text-sm mb-4">
               Введите ID пользователя ECHO чтобы отправить запрос в друзья.
             </p>
 
@@ -223,13 +223,13 @@ export function FriendsList() {
                 value={addFriendId}
                 onChange={(e) => setAddFriendId(e.target.value)}
                 placeholder="Введите ID пользователя"
-                className="bg-zinc-900 border-zinc-700 text-white"
+                className="bg-[#111111] border-[#1a1a1a] text-foreground"
                 onKeyDown={(e) => e.key === "Enter" && handleAddFriend()}
               />
               <Button
                 onClick={handleAddFriend}
                 disabled={isLoading || !addFriendId.trim()}
-                className="bg-indigo-500 hover:bg-indigo-600"
+                className="bg-acid text-black hover:bg-acid-dim"
               >
                 <UserPlus className="w-4 h-4 mr-2" />
                 Отправить
@@ -239,7 +239,7 @@ export function FriendsList() {
             {message && (
               <p className={cn(
                 "mt-3 text-sm",
-                message.type === "success" ? "text-green-500" : "text-red-500"
+                message.type === "success" ? "text-acid" : "text-destructive"
               )}>
                 {message.text}
               </p>
@@ -253,25 +253,25 @@ export function FriendsList() {
             {/* Incoming requests */}
             {incomingRequests.length > 0 && (
               <div>
-                <h3 className="text-xs font-semibold text-zinc-400 uppercase mb-2">
+                <h3 className="text-xs font-semibold text-[#555] uppercase mb-2">
                   Входящие — {incomingRequests.length}
                 </h3>
                 <div className="space-y-1">
                   {incomingRequests.map((request) => (
                     <div
                       key={request.id}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-zinc-800/50"
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-[#141414]/50"
                     >
                       <div className="flex items-center gap-3">
                         <Avatar>
                           <AvatarImage src={request.sender?.imageUrl} />
-                          <AvatarFallback className="bg-indigo-500">
+                          <AvatarFallback className="bg-acid/20 text-acid">
                             {request.sender?.name.slice(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium text-white">{request.sender?.name}</p>
-                          <p className="text-xs text-zinc-400">Входящий запрос</p>
+                          <p className="font-medium text-foreground">{request.sender?.name}</p>
+                          <p className="text-xs text-[#555]">Входящий запрос</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -279,7 +279,7 @@ export function FriendsList() {
                           size="icon"
                           variant="ghost"
                           onClick={() => handleAcceptRequest(request.id)}
-                          className="h-9 w-9 rounded-full bg-zinc-700 hover:bg-green-600"
+                          className="h-9 w-9 rounded-full bg-[#1a1a1a] hover:bg-acid/20"
                         >
                           <Check className="w-5 h-5" />
                         </Button>
@@ -287,7 +287,7 @@ export function FriendsList() {
                           size="icon"
                           variant="ghost"
                           onClick={() => handleDeclineRequest(request.id)}
-                          className="h-9 w-9 rounded-full bg-zinc-700 hover:bg-red-600"
+                          className="h-9 w-9 rounded-full bg-[#1a1a1a] hover:bg-destructive/30"
                         >
                           <X className="w-5 h-5" />
                         </Button>
@@ -301,28 +301,28 @@ export function FriendsList() {
             {/* Outgoing requests */}
             {outgoingRequests.length > 0 && (
               <div>
-                <h3 className="text-xs font-semibold text-zinc-400 uppercase mb-2">
+                <h3 className="text-xs font-semibold text-[#555] uppercase mb-2">
                   Исходящие — {outgoingRequests.length}
                 </h3>
                 <div className="space-y-1">
                   {outgoingRequests.map((request) => (
                     <div
                       key={request.id}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-zinc-800/50"
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-[#141414]/50"
                     >
                       <div className="flex items-center gap-3">
                         <Avatar>
                           <AvatarImage src={request.receiver?.imageUrl} />
-                          <AvatarFallback className="bg-indigo-500">
+                          <AvatarFallback className="bg-acid/20 text-acid">
                             {request.receiver?.name.slice(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium text-white">{request.receiver?.name}</p>
-                          <p className="text-xs text-zinc-400">Исходящий запрос</p>
+                          <p className="font-medium text-foreground">{request.receiver?.name}</p>
+                          <p className="text-xs text-[#555]">Исходящий запрос</p>
                         </div>
                       </div>
-                      <Clock className="w-5 h-5 text-zinc-500" />
+                      <Clock className="w-5 h-5 text-[#444]" />
                     </div>
                   ))}
                 </div>
@@ -330,7 +330,7 @@ export function FriendsList() {
             )}
 
             {incomingRequests.length === 0 && outgoingRequests.length === 0 && (
-              <div className="text-center py-12 text-zinc-400">
+              <div className="text-center py-12 text-[#555]">
                 <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>Нет ожидающих запросов</p>
               </div>
@@ -343,12 +343,12 @@ export function FriendsList() {
           <div>
             {/* Search */}
             <div className="relative mb-4">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#444]" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Поиск"
-                className="pl-9 bg-zinc-900 border-zinc-700 text-white"
+                className="pl-9 bg-[#111111] border-[#1a1a1a] text-foreground"
               />
             </div>
 
@@ -357,21 +357,21 @@ export function FriendsList() {
               {(activeTab === "online" ? onlineFriends : filteredFriends).map((friend) => (
                 <div
                   key={friend.friendshipId}
-                  className="flex items-center justify-between p-2 rounded-lg hover:bg-zinc-800/50 group"
+                  className="flex items-center justify-between p-2 rounded-lg hover:bg-[#141414]/50 group"
                 >
                   <div className="flex items-center gap-3">
                     <div className="relative">
                       <Avatar>
                         <AvatarImage src={friend.imageUrl} />
-                        <AvatarFallback className="bg-indigo-500">
+                        <AvatarFallback className="bg-acid/20 text-acid">
                           {friend.name.slice(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-zinc-800 bg-green-500" />
+                      <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#141414] bg-acid" />
                     </div>
                     <div>
-                      <p className="font-medium text-white">{friend.name}</p>
-                      <p className="text-xs text-zinc-400">
+                      <p className="font-medium text-foreground">{friend.name}</p>
+                      <p className="text-xs text-[#555]">
                         В сети
                       </p>
                     </div>
@@ -382,7 +382,7 @@ export function FriendsList() {
                       size="icon"
                       variant="ghost"
                       onClick={() => startChat(friend.id)}
-                      className="h-9 w-9 rounded-full bg-zinc-700 hover:bg-zinc-600"
+                      className="h-9 w-9 rounded-full bg-[#1a1a1a] hover:bg-[#222]"
                     >
                       <MessageCircle className="w-5 h-5" />
                     </Button>
@@ -390,7 +390,7 @@ export function FriendsList() {
                       size="icon"
                       variant="ghost"
                       onClick={() => startCall(friend.id)}
-                      className="h-9 w-9 rounded-full bg-zinc-700 hover:bg-zinc-600"
+                      className="h-9 w-9 rounded-full bg-[#1a1a1a] hover:bg-[#222]"
                     >
                       <Phone className="w-5 h-5" />
                     </Button>
@@ -399,13 +399,13 @@ export function FriendsList() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="h-9 w-9 rounded-full bg-zinc-700 hover:bg-zinc-600"
+                          className="h-9 w-9 rounded-full bg-[#1a1a1a] hover:bg-[#222]"
                         >
                           <MoreVertical className="w-5 h-5" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="bg-zinc-900 border-zinc-700">
-                        <DropdownMenuItem className="text-red-500 focus:text-red-500">
+                      <DropdownMenuContent className="bg-[#111111] border-[#1a1a1a]">
+                        <DropdownMenuItem className="text-destructive focus:text-destructive">
                           Удалить из друзей
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -415,7 +415,7 @@ export function FriendsList() {
               ))}
 
               {(activeTab === "online" ? onlineFriends : filteredFriends).length === 0 && (
-                <div className="text-center py-12 text-zinc-400">
+                <div className="text-center py-12 text-[#555]">
                   <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
                   <p>
                     {activeTab === "online"

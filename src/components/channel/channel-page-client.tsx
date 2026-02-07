@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Channel, ChannelType, Member, Server } from "@prisma/client";
+import { Channel, ChannelType, Member, Profile, Server } from "@prisma/client";
 import { ChatHeader } from "@/components/chat/chat-header";
 import { ChatMessages } from "@/components/chat/chat-messages";
 import { ChatInput } from "@/components/chat/chat-input";
 import { MediaRoom } from "@/components/media-room";
 import { MusicPanel } from "@/components/music/music-panel";
 
+type MemberWithProfile = Member & { profile: Profile };
+
 interface ChannelPageClientProps {
   channel: Channel;
-  member: Member;
+  member: MemberWithProfile;
   server: Server;
   serverId: string;
 }
@@ -68,7 +70,7 @@ export function ChannelPageClient({ channel, member, server, serverId }: Channel
             channelName={channel.name}
             serverId={serverId}
             serverName={server.name}
-            profileName={member.profile?.name || "User"}
+            username={member.profile.name}
           />
         )}
       </div>

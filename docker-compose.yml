@@ -18,6 +18,31 @@ services:
     networks:
       - internal
 
+  # LiveKit - Voice/Video сервер
+  livekit:
+    image: livekit/livekit-server:latest
+    container_name: connect-chuba-livekit
+    restart: unless-stopped
+    command: --config /etc/livekit.yaml
+    volumes:
+      - ./livekit.yaml:/etc/livekit.yaml:ro
+    ports:
+      # WebRTC UDP media
+      - "50000-50200:50000-50200/udp"
+      # TURN TCP fallback
+      - "7881:7881/tcp"
+    networks:
+      - internal
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      # LiveKit WebSocket/API — маршрутизация по PathPrefix /rtc и /twirp
+      - "traefik.http.routers.livekit.rule=Host(`chat.airecho.net`) && (PathPrefix(`/rtc`) || PathPrefix(`/twirp`))"
+      - "traefik.http.routers.livekit.entrypoints=websecure"
+      - "traefik.http.routers.livekit.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.livekit.priority=20"
+      - "traefik.http.services.livekit.loadbalancer.server.port=7880"
+
   # Приложение Connect Chuba
   app:
     build:
@@ -49,6 +74,7 @@ services:
       - "traefik.http.routers.connect-chuba.rule=Host(`chat.airecho.net`)"
       - "traefik.http.routers.connect-chuba.entrypoints=websecure"
       - "traefik.http.routers.connect-chuba.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.connect-chuba.priority=10"
       - "traefik.http.services.connect-chuba.loadbalancer.server.port=3000"
 
 volumes:

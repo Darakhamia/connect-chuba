@@ -180,7 +180,7 @@ export function FriendsList() {
         <Users className="w-5 h-5 text-muted-foreground" />
         <span className="font-semibold text-foreground">Друзья</span>
         
-        <div className="h-6 w-[1px] bg-[#1a1a1a] mx-2" />
+        <div className="h-6 w-[1px] bg-secondary mx-2" />
         
         {/* Tabs */}
         <div className="flex items-center gap-2">
@@ -192,11 +192,11 @@ export function FriendsList() {
                 "px-2 py-1 rounded text-sm font-medium transition-colors",
                 activeTab === tab.id
                   ? tab.isGreen
-                    ? "bg-acid/20 text-foreground"
-                    : "bg-[#1a1a1a] text-foreground"
+                    ? "bg-primary/20 text-foreground"
+                    : "bg-secondary text-foreground"
                   : tab.isGreen
-                    ? "text-acid hover:bg-[#1a1a1a]/50"
-                    : "text-muted-foreground hover:bg-[#1a1a1a]/50 hover:text-foreground"
+                    ? "text-primary hover:bg-secondary/50"
+                    : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
               )}
             >
               {tab.label}
@@ -229,7 +229,7 @@ export function FriendsList() {
               <Button
                 onClick={handleAddFriend}
                 disabled={isLoading || !addFriendId.trim()}
-                className="bg-acid text-black hover:bg-acid-dim"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <UserPlus className="w-4 h-4 mr-2" />
                 Отправить
@@ -239,7 +239,7 @@ export function FriendsList() {
             {message && (
               <p className={cn(
                 "mt-3 text-sm",
-                message.type === "success" ? "text-acid" : "text-destructive"
+                message.type === "success" ? "text-primary" : "text-destructive"
               )}>
                 {message.text}
               </p>
@@ -260,12 +260,12 @@ export function FriendsList() {
                   {incomingRequests.map((request) => (
                     <div
                       key={request.id}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-[#141414]/50"
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-card/50"
                     >
                       <div className="flex items-center gap-3">
                         <Avatar>
                           <AvatarImage src={request.sender?.imageUrl} />
-                          <AvatarFallback className="bg-acid/20 text-acid">
+                          <AvatarFallback className="bg-primary/20 text-primary">
                             {request.sender?.name.slice(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
@@ -279,7 +279,7 @@ export function FriendsList() {
                           size="icon"
                           variant="ghost"
                           onClick={() => handleAcceptRequest(request.id)}
-                          className="h-9 w-9 rounded-full bg-[#1a1a1a] hover:bg-acid/20"
+                          className="h-9 w-9 rounded-full bg-secondary hover:bg-primary/20"
                         >
                           <Check className="w-5 h-5" />
                         </Button>
@@ -287,7 +287,7 @@ export function FriendsList() {
                           size="icon"
                           variant="ghost"
                           onClick={() => handleDeclineRequest(request.id)}
-                          className="h-9 w-9 rounded-full bg-[#1a1a1a] hover:bg-destructive/30"
+                          className="h-9 w-9 rounded-full bg-secondary hover:bg-destructive/30"
                         >
                           <X className="w-5 h-5" />
                         </Button>
@@ -308,12 +308,12 @@ export function FriendsList() {
                   {outgoingRequests.map((request) => (
                     <div
                       key={request.id}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-[#141414]/50"
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-card/50"
                     >
                       <div className="flex items-center gap-3">
                         <Avatar>
                           <AvatarImage src={request.receiver?.imageUrl} />
-                          <AvatarFallback className="bg-acid/20 text-acid">
+                          <AvatarFallback className="bg-primary/20 text-primary">
                             {request.receiver?.name.slice(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
@@ -357,17 +357,17 @@ export function FriendsList() {
               {(activeTab === "online" ? onlineFriends : filteredFriends).map((friend) => (
                 <div
                   key={friend.friendshipId}
-                  className="flex items-center justify-between p-2 rounded-lg hover:bg-[#141414]/50 group"
+                  className="flex items-center justify-between p-2 rounded-lg hover:bg-card/50 group"
                 >
                   <div className="flex items-center gap-3">
                     <div className="relative">
                       <Avatar>
                         <AvatarImage src={friend.imageUrl} />
-                        <AvatarFallback className="bg-acid/20 text-acid">
+                        <AvatarFallback className="bg-primary/20 text-primary">
                           {friend.name.slice(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-secondary bg-acid" />
+                      <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-secondary bg-discord-green" />
                     </div>
                     <div>
                       <p className="font-medium text-foreground">{friend.name}</p>
@@ -382,7 +382,7 @@ export function FriendsList() {
                       size="icon"
                       variant="ghost"
                       onClick={() => startChat(friend.id)}
-                      className="h-9 w-9 rounded-full bg-[#1a1a1a] hover:bg-secondary"
+                      className="h-9 w-9 rounded-full bg-secondary hover:bg-secondary"
                     >
                       <MessageCircle className="w-5 h-5" />
                     </Button>
@@ -390,7 +390,7 @@ export function FriendsList() {
                       size="icon"
                       variant="ghost"
                       onClick={() => startCall(friend.id)}
-                      className="h-9 w-9 rounded-full bg-[#1a1a1a] hover:bg-secondary"
+                      className="h-9 w-9 rounded-full bg-secondary hover:bg-secondary"
                     >
                       <Phone className="w-5 h-5" />
                     </Button>
@@ -399,7 +399,7 @@ export function FriendsList() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="h-9 w-9 rounded-full bg-[#1a1a1a] hover:bg-secondary"
+                          className="h-9 w-9 rounded-full bg-secondary hover:bg-secondary"
                         >
                           <MoreVertical className="w-5 h-5" />
                         </Button>

@@ -76,7 +76,7 @@ export function UserPanel({ profile }: UserPanelProps) {
             <div className="relative">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={profile.imageUrl} />
-                <AvatarFallback className="bg-acid/20 text-foreground text-xs">
+                <AvatarFallback className="bg-primary/20 text-foreground text-xs">
                   {profile.name.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -108,7 +108,7 @@ export function UserPanel({ profile }: UserPanelProps) {
             <div className="flex items-center gap-3 mb-3">
               <Avatar className="h-12 w-12">
                 <AvatarImage src={profile.imageUrl} />
-                <AvatarFallback className="bg-acid/20 text-foreground">
+                <AvatarFallback className="bg-primary/20 text-foreground">
                   {profile.name.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -124,7 +124,7 @@ export function UserPanel({ profile }: UserPanelProps) {
             )}
           </div>
           
-          <DropdownMenuSeparator className="bg-[#151515]" />
+          <DropdownMenuSeparator className="bg-secondary" />
           
           {/* Status selection */}
           <div className="p-1">
@@ -139,7 +139,7 @@ export function UserPanel({ profile }: UserPanelProps) {
                   onClick={() => handleStatusChange(option.value)}
                   className={cn(
                     "cursor-pointer",
-                    status === option.value && "bg-[#151515]"
+                    status === option.value && "bg-secondary"
                   )}
                 >
                   <Icon className={cn("w-4 h-4 mr-2", option.color, option.fill)} />
@@ -149,7 +149,7 @@ export function UserPanel({ profile }: UserPanelProps) {
             })}
           </div>
           
-          <DropdownMenuSeparator className="bg-[#151515]" />
+          <DropdownMenuSeparator className="bg-secondary" />
           
           {/* Settings */}
           <DropdownMenuItem
@@ -160,7 +160,7 @@ export function UserPanel({ profile }: UserPanelProps) {
             Настройки
           </DropdownMenuItem>
           
-          <DropdownMenuSeparator className="bg-[#151515]" />
+          <DropdownMenuSeparator className="bg-secondary" />
           
           {/* Logout */}
           <DropdownMenuItem

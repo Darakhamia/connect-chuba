@@ -39,7 +39,7 @@ type MemberRole = "GUEST" | "MODERATOR" | "ADMIN";
 
 const roleIconMap: Record<MemberRole, React.ReactNode> = {
   GUEST: null,
-  MODERATOR: <ShieldCheck className="h-4 w-4 ml-2 text-acid" />,
+  MODERATOR: <ShieldCheck className="h-4 w-4 ml-2 text-primary" />,
   ADMIN: <ShieldAlert className="h-4 w-4 ml-2 text-rose-500" />,
 };
 

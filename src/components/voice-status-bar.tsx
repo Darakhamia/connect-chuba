@@ -32,13 +32,13 @@ export function VoiceStatusBar() {
   };
 
   return (
-    <div className="fixed bottom-0 left-[72px] right-0 h-14 bg-[#1a1b1e] border-t border-border z-50">
+    <div className="fixed bottom-0 left-[72px] right-0 h-14 bg-card border-t border-border z-50">
       <div className="flex items-center justify-between h-full px-4">
         {/* Левая часть - информация о канале */}
         <div className="flex items-center gap-3">
           <div className={cn(
             "w-10 h-10 rounded-lg flex items-center justify-center",
-            isVideo ? "bg-acid/20" : "bg-green-500"
+            isVideo ? "bg-primary/20" : "bg-green-500"
           )}>
             {isVideo ? (
               <Video className="w-5 h-5 text-foreground" />

@@ -87,13 +87,13 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#0e0e0e]">
+    <div className="flex flex-col h-full bg-chat-area">
       {/* Header */}
-      <div className="h-12 border-b border-[#1a1a1a] flex items-center justify-between px-4">
+      <div className="h-12 border-b border-border flex items-center justify-between px-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8">
             <AvatarImage src={otherProfile.imageUrl} />
-            <AvatarFallback className="bg-acid/20 text-foreground text-xs">
+            <AvatarFallback className="bg-primary/20 text-foreground text-xs">
               {otherProfile.name.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -118,7 +118,7 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="text-[#555] hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground"
                 onClick={() => {
                   setIsVideoCall(false);
                   setIsInCall(true);
@@ -130,7 +130,7 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="text-[#555] hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground"
                 onClick={() => {
                   setIsVideoCall(true);
                   setIsInCall(true);
@@ -141,7 +141,7 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
               </Button>
             </>
           )}
-          <Button variant="ghost" size="icon" className="text-[#555] hover:text-foreground">
+          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
             <MoreVertical className="h-5 w-5" />
           </Button>
         </div>
@@ -166,12 +166,12 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
           <div className="text-center py-8">
             <Avatar className="h-20 w-20 mx-auto mb-4">
               <AvatarImage src={otherProfile.imageUrl} />
-              <AvatarFallback className="bg-acid/20 text-foreground text-2xl">
+              <AvatarFallback className="bg-primary/20 text-foreground text-2xl">
                 {otherProfile.name.slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <h2 className="text-2xl font-bold text-foreground">{otherProfile.name}</h2>
-            <p className="text-[#555] mt-1">
+            <p className="text-muted-foreground mt-1">
               Это начало вашей беседы с {otherProfile.name}
             </p>
           </div>
@@ -189,7 +189,7 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
                 {showAvatar ? (
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={message.profile.imageUrl} />
-                    <AvatarFallback className="bg-acid/20 text-foreground text-xs">
+                    <AvatarFallback className="bg-primary/20 text-foreground text-xs">
                       {message.profile.name.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -203,12 +203,12 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
                       <span className="font-semibold text-foreground text-sm">
                         {message.profile.name}
                       </span>
-                      <span className="text-xs text-[#444]">
+                      <span className="text-xs text-muted-foreground">
                         {format(new Date(message.createdAt), "dd MMM, HH:mm", { locale: ru })}
                       </span>
                     </div>
                   )}
-                  <p className="text-[#999]">{message.content}</p>
+                  <p className="text-foreground">{message.content}</p>
                 </div>
               </div>
             );
@@ -222,14 +222,14 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
       {/* Input */}
       {!isInCall && (
         <form onSubmit={sendMessage} className="p-4">
-        <div className="flex items-center gap-2 px-4 py-2 bg-[#383a40] rounded-lg">
+        <div className="flex items-center gap-2 px-4 py-2 bg-chat-input rounded-lg">
           <button 
             type="button" 
             onClick={() => onOpen("messageFile", {
               apiUrl: `/api/dm/${conversationId}/messages`,
               query: {}
             })}
-            className="text-[#555] hover:text-foreground transition"
+            className="text-muted-foreground hover:text-foreground transition"
             title="Прикрепить файл"
           >
             <Plus className="h-6 w-6" />
@@ -239,7 +239,7 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder={`Написать ${otherProfile.name}`}
-            className="flex-1 bg-transparent border-0 focus-visible:ring-0 text-foreground placeholder:text-[#444]"
+            className="flex-1 bg-transparent border-0 focus-visible:ring-0 text-foreground placeholder:text-muted-foreground"
             disabled={isLoading}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -253,7 +253,7 @@ export function DMChatArea({ conversationId, currentProfile, otherProfile }: DMC
           
           <button 
             type="button" 
-            className="text-[#555] hover:text-foreground transition"
+            className="text-muted-foreground hover:text-foreground transition"
             title="Эмодзи (скоро)"
           >
             <Smile className="h-6 w-6" />

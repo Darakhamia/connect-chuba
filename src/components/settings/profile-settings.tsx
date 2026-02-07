@@ -109,7 +109,7 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
         <div className="relative group">
           <Avatar className="w-24 h-24">
             <AvatarImage src={imageUrl} />
-            <AvatarFallback className="bg-acid/20 text-2xl text-foreground">
+            <AvatarFallback className="bg-primary/20 text-2xl text-foreground">
               {profile.name.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>

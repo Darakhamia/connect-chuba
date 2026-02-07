@@ -25,28 +25,28 @@ export function NavigationHome() {
             className={cn(
               "group relative flex items-center justify-center w-12 h-12 rounded-[24px] transition-all duration-200 overflow-hidden",
               isActive
-                ? "rounded-[16px] bg-acid/15 glow-acid-sm"
-                : "bg-[#111111] hover:rounded-[16px] hover:bg-acid/10"
+                ? "rounded-[16px] bg-primary/15"
+                : "bg-card hover:rounded-[16px] hover:bg-primary/10"
             )}
           >
             <Sparkles
               className={cn(
                 "w-6 h-6 transition-colors",
-                isActive ? "text-acid" : "text-acid/50 group-hover:text-acid"
+                isActive ? "text-primary" : "text-primary/50 group-hover:text-primary"
               )}
             />
 
             {/* Active indicator pill */}
             <div
               className={cn(
-                "absolute left-0 w-1 rounded-r-full transition-all duration-200 bg-acid",
+                "absolute left-0 w-1 rounded-r-full transition-all duration-200 bg-primary",
                 isActive ? "h-10" : "h-0 group-hover:h-5"
               )}
               style={{ transform: "translateX(-8px)" }}
             />
           </button>
         </TooltipTrigger>
-        <TooltipContent side="right" className="bg-[#111111] text-foreground border-border">
+        <TooltipContent side="right" className="bg-popover text-foreground border-border">
           <p className="font-semibold">Главная</p>
         </TooltipContent>
       </Tooltip>

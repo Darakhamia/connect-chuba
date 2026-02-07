@@ -103,7 +103,7 @@ export function SettingsPage({ profile }: SettingsPageProps) {
         {/* User info at bottom */}
         <div className="p-2 border-t border-border">
           <div className="flex items-center gap-2 p-2 rounded bg-secondary/50">
-            <div className="w-8 h-8 rounded-full bg-acid/20 flex items-center justify-center text-foreground text-sm font-semibold">
+            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-foreground text-sm font-semibold">
               {profile.name.slice(0, 2).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">

@@ -46,10 +46,10 @@ export function DMCall({
 
   if (error) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#111111]">
+      <div className="flex-1 flex items-center justify-center bg-background">
         <div className="text-center">
           <p className="text-red-500 mb-2">Ошибка подключения</p>
-          <p className="text-[#555] text-sm">{error}</p>
+          <p className="text-muted-foreground text-sm">{error}</p>
         </div>
       </div>
     );
@@ -57,14 +57,14 @@ export function DMCall({
 
   if (!token) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#111111]">
-        <Loader2 className="h-8 w-8 animate-spin text-[#555]" />
+      <div className="flex-1 flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   return (
-    <div className="flex-1 bg-[#111111]">
+    <div className="flex-1 bg-background">
       <LiveKitRoom
         data-lk-theme="default"
         serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}

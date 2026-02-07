@@ -113,7 +113,7 @@ export function DMSidebar({ profile }: DMSidebarProps) {
                       {conv.profile.name.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-acid border-2 border-channel-sidebar" />
+                  <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-discord-green border-2 border-channel-sidebar" />
                 </div>
                 <div className="flex-1 min-w-0 text-left">
                   <p className={cn(

@@ -16,7 +16,7 @@ function ToggleSwitch({ enabled, onChange }: ToggleSwitchProps) {
       onClick={() => onChange(!enabled)}
       className={cn(
         "relative w-11 h-6 rounded-full transition-colors",
-        enabled ? "bg-acid/20" : "bg-secondary"
+        enabled ? "bg-primary/20" : "bg-secondary"
       )}
     >
       <div

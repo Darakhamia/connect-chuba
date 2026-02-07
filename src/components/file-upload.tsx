@@ -88,7 +88,7 @@ export function FileUpload({ endpoint, value, onChange }: FileUploadProps) {
           href={value}
           target="_blank"
           rel="noopener noreferrer"
-          className="ml-2 text-sm text-acid hover:underline"
+          className="ml-2 text-sm text-primary hover:underline"
         >
           {value}
         </a>

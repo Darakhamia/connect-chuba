@@ -31,6 +31,8 @@ services:
         - NEXT_PUBLIC_LIVEKIT_URL=${NEXT_PUBLIC_LIVEKIT_URL}
     container_name: connect-chuba-app
     restart: unless-stopped
+    ports:
+      - "3000:3000"
     environment:
       - DATABASE_URL=postgresql://chuba_user:Ch8b4_Pr0d_2026!@db:5432/connect_chuba
       - HOSTNAME=0.0.0.0

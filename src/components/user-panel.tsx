@@ -24,7 +24,7 @@ const statusOptions = [
   { value: "ONLINE" as UserStatus, label: "В сети", icon: Circle, color: "text-green-500", fill: "fill-green-500" },
   { value: "IDLE" as UserStatus, label: "Не активен", icon: Moon, color: "text-yellow-500", fill: "fill-yellow-500" },
   { value: "DND" as UserStatus, label: "Не беспокоить", icon: MinusCircle, color: "text-red-500", fill: "fill-red-500" },
-  { value: "INVISIBLE" as UserStatus, label: "Невидимый", icon: EyeOff, color: "text-[#444]", fill: "fill-zinc-500" },
+  { value: "INVISIBLE" as UserStatus, label: "Невидимый", icon: EyeOff, color: "text-muted-foreground", fill: "fill-muted-foreground" },
 ];
 
 export function UserPanel({ profile }: UserPanelProps) {
@@ -72,7 +72,7 @@ export function UserPanel({ profile }: UserPanelProps) {
     <div className="p-2 bg-user-panel">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="w-full flex items-center gap-2 p-1 rounded hover:bg-[#151515] transition-colors">
+          <button className="w-full flex items-center gap-2 p-1 rounded hover:bg-sidebar-accent transition-colors">
             <div className="relative">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={profile.imageUrl} />
@@ -81,7 +81,7 @@ export function UserPanel({ profile }: UserPanelProps) {
                 </AvatarFallback>
               </Avatar>
               <div className={cn(
-                "absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#232428]",
+                "absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-user-panel",
                 status === "ONLINE" && "bg-green-500",
                 status === "IDLE" && "bg-yellow-500",
                 status === "DND" && "bg-red-500",
@@ -91,7 +91,7 @@ export function UserPanel({ profile }: UserPanelProps) {
             </div>
             <div className="flex-1 min-w-0 text-left">
               <p className="text-sm font-medium text-foreground truncate">{profile.name}</p>
-              <p className="text-xs text-[#555] truncate">
+              <p className="text-xs text-muted-foreground truncate">
                 {profile.bio || currentStatus.label}
               </p>
             </div>
@@ -101,7 +101,7 @@ export function UserPanel({ profile }: UserPanelProps) {
         <DropdownMenuContent 
           side="top" 
           align="start" 
-          className="w-56 bg-[#0e0e0e] border-[#1a1a1a]"
+          className="w-56 bg-popover border-border"
         >
           {/* User card */}
           <div className="p-3">
@@ -114,11 +114,11 @@ export function UserPanel({ profile }: UserPanelProps) {
               </Avatar>
               <div>
                 <p className="font-semibold text-foreground">{profile.name}</p>
-                <p className="text-xs text-[#555]">{profile.email}</p>
+                <p className="text-xs text-muted-foreground">{profile.email}</p>
               </div>
             </div>
             {profile.bio && (
-              <p className="text-sm text-[#999] bg-[#111] p-2 rounded">
+              <p className="text-sm text-muted-foreground bg-card p-2 rounded">
                 {profile.bio}
               </p>
             )}
@@ -128,7 +128,7 @@ export function UserPanel({ profile }: UserPanelProps) {
           
           {/* Status selection */}
           <div className="p-1">
-            <p className="px-2 py-1 text-xs font-semibold text-[#555] uppercase">
+            <p className="px-2 py-1 text-xs font-semibold text-muted-foreground uppercase">
               Статус
             </p>
             {statusOptions.map((option) => {

@@ -16,7 +16,7 @@ function ToggleSwitch({ enabled, onChange }: ToggleSwitchProps) {
       onClick={() => onChange(!enabled)}
       className={cn(
         "relative w-11 h-6 rounded-full transition-colors",
-        enabled ? "bg-acid/20" : "bg-[#222]"
+        enabled ? "bg-acid/20" : "bg-secondary"
       )}
     >
       <div
@@ -86,15 +86,15 @@ export function NotificationSettings() {
       {/* Desktop notifications */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Bell className="w-5 h-5 text-[#555]" />
+          <Bell className="w-5 h-5 text-muted-foreground" />
           <h3 className="text-lg font-semibold text-foreground">Уведомления на рабочем столе</h3>
         </div>
 
         <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 rounded-lg bg-[#141414]/50">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
             <div>
               <p className="text-foreground">Включить уведомления</p>
-              <p className="text-sm text-[#444]">Получать уведомления на рабочий стол</p>
+              <p className="text-sm text-muted-foreground">Получать уведомления на рабочий стол</p>
             </div>
             <ToggleSwitch
               enabled={desktopNotifications}
@@ -102,12 +102,12 @@ export function NotificationSettings() {
             />
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-lg bg-[#141414]/50">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
             <div className="flex items-center gap-3">
-              <Volume2 className="w-5 h-5 text-[#555]" />
+              <Volume2 className="w-5 h-5 text-muted-foreground" />
               <div>
                 <p className="text-foreground">Звуковые уведомления</p>
-                <p className="text-sm text-[#444]">Воспроизводить звук при уведомлениях</p>
+                <p className="text-sm text-muted-foreground">Воспроизводить звук при уведомлениях</p>
               </div>
             </div>
             <ToggleSwitch
@@ -121,22 +121,22 @@ export function NotificationSettings() {
         </div>
       </div>
 
-      <div className="h-[1px] bg-[#1a1a1a]" />
+      <div className="h-[1px] bg-border" />
 
       {/* Message notifications */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <MessageCircle className="w-5 h-5 text-[#555]" />
+          <MessageCircle className="w-5 h-5 text-muted-foreground" />
           <h3 className="text-lg font-semibold text-foreground">Уведомления о сообщениях</h3>
         </div>
 
         <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 rounded-lg bg-[#141414]/50">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
             <div className="flex items-center gap-3">
-              <AtSign className="w-5 h-5 text-[#555]" />
+              <AtSign className="w-5 h-5 text-muted-foreground" />
               <div>
                 <p className="text-foreground">Упоминания</p>
-                <p className="text-sm text-[#444]">Когда вас упоминают (@)</p>
+                <p className="text-sm text-muted-foreground">Когда вас упоминают (@)</p>
               </div>
             </div>
             <ToggleSwitch
@@ -145,10 +145,10 @@ export function NotificationSettings() {
             />
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-lg bg-[#141414]/50">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
             <div>
               <p className="text-foreground">Личные сообщения</p>
-              <p className="text-sm text-[#444]">Сообщения в личных чатах</p>
+              <p className="text-sm text-muted-foreground">Сообщения в личных чатах</p>
             </div>
             <ToggleSwitch
               enabled={dmNotifications}
@@ -156,10 +156,10 @@ export function NotificationSettings() {
             />
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-lg bg-[#141414]/50">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
             <div>
               <p className="text-foreground">Все сообщения серверов</p>
-              <p className="text-sm text-[#444]">Все сообщения во всех каналах</p>
+              <p className="text-sm text-muted-foreground">Все сообщения во всех каналах</p>
             </div>
             <ToggleSwitch
               enabled={serverNotifications}
@@ -169,7 +169,7 @@ export function NotificationSettings() {
         </div>
       </div>
 
-      <div className="h-[1px] bg-[#1a1a1a]" />
+      <div className="h-[1px] bg-border" />
 
       {/* Notification sounds */}
       <div className="space-y-4">
@@ -179,7 +179,7 @@ export function NotificationSettings() {
           {(Object.keys(notificationSounds) as Array<keyof typeof notificationSounds>).map((sound) => (
             <div
               key={sound}
-              className="flex items-center justify-between p-3 rounded-lg bg-[#141414]/50"
+              className="flex items-center justify-between p-3 rounded-lg bg-secondary/50"
             >
               <span className="text-sm text-foreground">{soundLabels[sound]}</span>
               <ToggleSwitch 

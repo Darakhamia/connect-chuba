@@ -54,7 +54,7 @@ export function DMSidebar({ profile }: DMSidebarProps) {
     <div className="w-60 h-full bg-channel-sidebar flex flex-col">
       {/* Search */}
       <div className="p-2">
-        <button className="w-full h-7 px-2 rounded bg-[#111111] text-[#444] text-sm text-left">
+        <button className="w-full h-7 px-2 rounded bg-card text-muted-foreground text-sm text-left">
           Найти или начать беседу
         </button>
       </div>
@@ -67,7 +67,7 @@ export function DMSidebar({ profile }: DMSidebarProps) {
             "w-full flex items-center gap-3 px-2 py-2 rounded transition-colors",
             isHome && !isDM
               ? "bg-accent/20 text-foreground"
-              : "text-[#555] hover:bg-[#1a1a1a]/30 hover:text-zinc-200"
+              : "text-muted-foreground hover:bg-border/30 hover:text-foreground"
           )}
         >
           <Users className="w-5 h-5" />
@@ -75,14 +75,14 @@ export function DMSidebar({ profile }: DMSidebarProps) {
         </button>
       </div>
 
-      <div className="h-[1px] bg-[#1a1a1a] mx-2 my-2" />
+      <div className="h-[1px] bg-border mx-2 my-2" />
 
       {/* DM header */}
       <div className="px-4 py-1 flex items-center justify-between">
-        <span className="text-xs font-semibold text-[#555] uppercase">
+        <span className="text-xs font-semibold text-muted-foreground uppercase">
           Личные сообщения
         </span>
-        <button className="text-[#555] hover:text-foreground">
+        <button className="text-muted-foreground hover:text-foreground">
           <Plus className="w-4 h-4" />
         </button>
       </div>
@@ -90,7 +90,7 @@ export function DMSidebar({ profile }: DMSidebarProps) {
       {/* DM list */}
       <div className="flex-1 px-2 py-2 overflow-y-auto">
         {dmConversations.length === 0 ? (
-          <p className="text-xs text-[#444] text-center py-4">
+          <p className="text-xs text-muted-foreground text-center py-4">
             Пока нет бесед
           </p>
         ) : (
@@ -103,7 +103,7 @@ export function DMSidebar({ profile }: DMSidebarProps) {
                   "w-full flex items-center gap-3 px-2 py-2 rounded transition-colors group",
                   currentDMId === conv.id
                     ? "bg-accent/20 text-foreground"
-                    : "hover:bg-[#1a1a1a]/50"
+                    : "hover:bg-border/50"
                 )}
               >
                 <div className="relative">
@@ -118,12 +118,12 @@ export function DMSidebar({ profile }: DMSidebarProps) {
                 <div className="flex-1 min-w-0 text-left">
                   <p className={cn(
                     "text-sm font-medium truncate",
-                    currentDMId === conv.id ? "text-foreground" : "text-[#999] group-hover:text-foreground"
+                    currentDMId === conv.id ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
                   )}>
                     {conv.profile.name}
                   </p>
                   {conv.lastMessage && (
-                    <p className="text-xs text-[#444] truncate">
+                    <p className="text-xs text-muted-foreground truncate">
                       {conv.lastMessage.content}
                     </p>
                   )}

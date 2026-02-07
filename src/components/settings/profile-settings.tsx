@@ -123,11 +123,11 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
         
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-foreground mb-1">{profile.name}</h3>
-          <p className="text-sm text-[#555] mb-3">{profile.email}</p>
+          <p className="text-sm text-muted-foreground mb-3">{profile.email}</p>
           <Button 
             variant="outline" 
             size="sm" 
-            className="border-[#222]"
+            className="border-border"
             onClick={() => setIsAvatarDialogOpen(true)}
           >
             Изменить аватар
@@ -137,7 +137,7 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
 
       {/* Avatar upload dialog */}
       <Dialog open={isAvatarDialogOpen} onOpenChange={setIsAvatarDialogOpen}>
-        <DialogContent className="bg-[#111111] border-[#1a1a1a]">
+        <DialogContent className="bg-card border-border">
           <DialogHeader>
             <DialogTitle className="text-foreground">Изменить аватар</DialogTitle>
           </DialogHeader>
@@ -149,67 +149,67 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
                 onChange={handleAvatarChange}
               />
             </div>
-            <p className="text-xs text-[#444] text-center">
+            <p className="text-xs text-muted-foreground text-center">
               Рекомендуемый размер: 128x128 пикселей
             </p>
           </div>
         </DialogContent>
       </Dialog>
 
-      <div className="h-[1px] bg-[#1a1a1a]" />
+      <div className="h-[1px] bg-border" />
 
       {/* Form */}
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="name" className="text-[#999]">Имя пользователя</Label>
+          <Label htmlFor="name" className="text-muted-foreground">Имя пользователя</Label>
           <Input
             id="name"
             value={name}
             onChange={(e) => handleNameChange(e.target.value)}
-            className="bg-[#111111] border-[#1a1a1a] text-foreground"
+            className="bg-card border-border text-foreground"
             placeholder="Ваше имя"
             maxLength={32}
           />
-          <p className="text-xs text-[#444]">{name.length}/32</p>
+          <p className="text-xs text-muted-foreground">{name.length}/32</p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="bio" className="text-[#999]">О себе</Label>
+          <Label htmlFor="bio" className="text-muted-foreground">О себе</Label>
           <textarea
             id="bio"
             value={bio}
             onChange={(e) => handleBioChange(e.target.value)}
-            className="w-full h-24 px-3 py-2 bg-[#111111] border border-[#1a1a1a] rounded-md text-foreground placeholder:text-[#444] focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+            className="w-full h-24 px-3 py-2 bg-card border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
             placeholder="Расскажите немного о себе..."
             maxLength={190}
           />
-          <p className="text-xs text-[#444]">{bio.length}/190</p>
+          <p className="text-xs text-muted-foreground">{bio.length}/190</p>
         </div>
 
         <div className="space-y-2">
-          <Label className="text-[#999]">Email</Label>
+          <Label className="text-muted-foreground">Email</Label>
           <Input
             value={profile.email}
             disabled
-            className="bg-[#111111] border-[#1a1a1a] text-[#444]"
+            className="bg-card border-border text-muted-foreground"
           />
-          <p className="text-xs text-[#444]">
+          <p className="text-xs text-muted-foreground">
             Email связан с вашим аккаунтом и не может быть изменён
           </p>
         </div>
 
         <div className="space-y-2">
-          <Label className="text-[#999]">ID для друзей</Label>
+          <Label className="text-muted-foreground">ID для друзей</Label>
           <div className="flex gap-2">
             <Input
               value={profile.id}
               disabled
-              className="bg-[#111111] border-[#1a1a1a] text-[#555] font-mono text-xs"
+              className="bg-card border-border text-muted-foreground font-mono text-xs"
             />
             <Button
               variant="outline"
               size="sm"
-              className={`shrink-0 ${copied ? "border-green-500 text-green-500" : "border-[#222]"}`}
+              className={`shrink-0 ${copied ? "border-green-500 text-green-500" : "border-border"}`}
               onClick={handleCopyId}
             >
               {copied ? (
@@ -225,13 +225,13 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
               )}
             </Button>
           </div>
-          <p className="text-xs text-[#444]">
+          <p className="text-xs text-muted-foreground">
             Отправьте этот ID другу чтобы он мог вас добавить
           </p>
         </div>
       </div>
 
-      <div className="h-[1px] bg-[#1a1a1a]" />
+      <div className="h-[1px] bg-border" />
 
       {/* Save button */}
       <div className="flex justify-end">

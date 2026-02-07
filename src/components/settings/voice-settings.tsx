@@ -188,23 +188,23 @@ export function VoiceSettings() {
       {/* Audio Input */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Mic className="w-5 h-5 text-[#555]" />
+          <Mic className="w-5 h-5 text-muted-foreground" />
           <h3 className="text-lg font-semibold text-foreground">Устройство ввода</h3>
         </div>
 
         <div className="space-y-3">
           <div className="space-y-2">
-            <Label className="text-[#555]">Микрофон</Label>
+            <Label className="text-muted-foreground">Микрофон</Label>
             <Select value={selectedAudioInput} onValueChange={handleAudioInputChange}>
-              <SelectTrigger className="bg-[#111111] border-[#1a1a1a] text-foreground">
+              <SelectTrigger className="bg-card border-border text-foreground">
                 <SelectValue placeholder="Выберите микрофон" />
               </SelectTrigger>
-              <SelectContent className="bg-[#111111] border-[#1a1a1a]">
+              <SelectContent className="bg-card border-border">
                 {audioInputs.map((device) => (
                   <SelectItem 
                     key={device.deviceId} 
                     value={device.deviceId}
-                    className="text-foreground hover:bg-[#141414]"
+                    className="text-foreground hover:bg-secondary"
                   >
                     {device.label}
                   </SelectItem>
@@ -215,8 +215,8 @@ export function VoiceSettings() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-[#555]">Громкость ввода</Label>
-              <span className="text-sm text-[#444]">{inputVolume}%</span>
+              <Label className="text-muted-foreground">Громкость ввода</Label>
+              <span className="text-sm text-muted-foreground">{inputVolume}%</span>
             </div>
             <input
               type="range"
@@ -224,19 +224,19 @@ export function VoiceSettings() {
               max="100"
               value={inputVolume}
               onChange={(e) => setInputVolume(Number(e.target.value))}
-              className="w-full h-2 bg-[#1a1a1a] rounded-lg appearance-none cursor-pointer accent-indigo-500"
+              className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer accent-indigo-500"
             />
           </div>
 
           {/* Input test */}
-          <div className="p-3 rounded-lg bg-[#141414]/50">
+          <div className="p-3 rounded-lg bg-secondary/50">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-[#555]">Проверка микрофона</p>
+              <p className="text-sm text-muted-foreground">Проверка микрофона</p>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={isTesting ? stopMicTest : startMicTest}
-                className="border-[#222]"
+                className="border-border"
               >
                 {isTesting ? (
                   <>
@@ -251,14 +251,14 @@ export function VoiceSettings() {
                 )}
               </Button>
             </div>
-            <div className="h-3 bg-[#1a1a1a] rounded-full overflow-hidden">
+            <div className="h-3 bg-border rounded-full overflow-hidden">
               <div 
                 className="h-full bg-green-500 transition-all duration-75"
                 style={{ width: `${micLevel}%` }}
               />
             </div>
             {isTesting && (
-              <p className="text-xs text-[#444] mt-2">
+              <p className="text-xs text-muted-foreground mt-2">
                 Говорите в микрофон — уровень должен меняться
               </p>
             )}
@@ -266,28 +266,28 @@ export function VoiceSettings() {
         </div>
       </div>
 
-      <div className="h-[1px] bg-[#1a1a1a]" />
+      <div className="h-[1px] bg-border" />
 
       {/* Audio Output */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Volume2 className="w-5 h-5 text-[#555]" />
+          <Volume2 className="w-5 h-5 text-muted-foreground" />
           <h3 className="text-lg font-semibold text-foreground">Устройство вывода</h3>
         </div>
 
         <div className="space-y-3">
           <div className="space-y-2">
-            <Label className="text-[#555]">Динамики</Label>
+            <Label className="text-muted-foreground">Динамики</Label>
             <Select value={selectedAudioOutput} onValueChange={setSelectedAudioOutput}>
-              <SelectTrigger className="bg-[#111111] border-[#1a1a1a] text-foreground">
+              <SelectTrigger className="bg-card border-border text-foreground">
                 <SelectValue placeholder="Выберите динамики" />
               </SelectTrigger>
-              <SelectContent className="bg-[#111111] border-[#1a1a1a]">
+              <SelectContent className="bg-card border-border">
                 {audioOutputs.map((device) => (
                   <SelectItem 
                     key={device.deviceId} 
                     value={device.deviceId}
-                    className="text-foreground hover:bg-[#141414]"
+                    className="text-foreground hover:bg-secondary"
                   >
                     {device.label}
                   </SelectItem>
@@ -298,8 +298,8 @@ export function VoiceSettings() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-[#555]">Громкость вывода</Label>
-              <span className="text-sm text-[#444]">{outputVolume}%</span>
+              <Label className="text-muted-foreground">Громкость вывода</Label>
+              <span className="text-sm text-muted-foreground">{outputVolume}%</span>
             </div>
             <input
               type="range"
@@ -307,34 +307,34 @@ export function VoiceSettings() {
               max="100"
               value={outputVolume}
               onChange={(e) => setOutputVolume(Number(e.target.value))}
-              className="w-full h-2 bg-[#1a1a1a] rounded-lg appearance-none cursor-pointer accent-indigo-500"
+              className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer accent-indigo-500"
             />
           </div>
         </div>
       </div>
 
-      <div className="h-[1px] bg-[#1a1a1a]" />
+      <div className="h-[1px] bg-border" />
 
       {/* Video */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Video className="w-5 h-5 text-[#555]" />
+          <Video className="w-5 h-5 text-muted-foreground" />
           <h3 className="text-lg font-semibold text-foreground">Видео</h3>
         </div>
 
         <div className="space-y-3">
           <div className="space-y-2">
-            <Label className="text-[#555]">Камера</Label>
+            <Label className="text-muted-foreground">Камера</Label>
             <Select value={selectedVideoInput} onValueChange={handleVideoInputChange}>
-              <SelectTrigger className="bg-[#111111] border-[#1a1a1a] text-foreground">
+              <SelectTrigger className="bg-card border-border text-foreground">
                 <SelectValue placeholder="Выберите камеру" />
               </SelectTrigger>
-              <SelectContent className="bg-[#111111] border-[#1a1a1a]">
+              <SelectContent className="bg-card border-border">
                 {videoInputs.map((device) => (
                   <SelectItem 
                     key={device.deviceId} 
                     value={device.deviceId}
-                    className="text-foreground hover:bg-[#141414]"
+                    className="text-foreground hover:bg-secondary"
                   >
                     {device.label}
                   </SelectItem>
@@ -344,7 +344,7 @@ export function VoiceSettings() {
           </div>
 
           {/* Video preview */}
-          <div className="relative aspect-video bg-[#111111] rounded-lg overflow-hidden">
+          <div className="relative aspect-video bg-card rounded-lg overflow-hidden">
             <video
               ref={videoRef}
               autoPlay
@@ -354,7 +354,7 @@ export function VoiceSettings() {
             />
             
             {!isVideoPreview && (
-              <div className="absolute inset-0 flex items-center justify-center text-center text-[#444]">
+              <div className="absolute inset-0 flex items-center justify-center text-center text-muted-foreground">
                 <div>
                   <Video className="w-12 h-12 mx-auto mb-2 opacity-50" />
                   <p className="text-sm">Предпросмотр камеры</p>
@@ -375,30 +375,30 @@ export function VoiceSettings() {
         </div>
       </div>
 
-      <div className="h-[1px] bg-[#1a1a1a]" />
+      <div className="h-[1px] bg-border" />
 
       {/* Screen share */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Monitor className="w-5 h-5 text-[#555]" />
+          <Monitor className="w-5 h-5 text-muted-foreground" />
           <h3 className="text-lg font-semibold text-foreground">Демонстрация экрана</h3>
         </div>
 
-        <div className="p-4 rounded-lg bg-[#141414]/50">
-          <p className="text-sm text-[#555] mb-3">
+        <div className="p-4 rounded-lg bg-secondary/50">
+          <p className="text-sm text-muted-foreground mb-3">
             Настройки качества при демонстрации экрана
           </p>
           
           <div className="space-y-2">
-            <Label className="text-[#555]">Качество</Label>
+            <Label className="text-muted-foreground">Качество</Label>
             <Select value={screenShareQuality} onValueChange={(v) => setScreenShareQuality(v as "480" | "720" | "1080")}>
-              <SelectTrigger className="bg-[#111111] border-[#1a1a1a] text-foreground">
+              <SelectTrigger className="bg-card border-border text-foreground">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#111111] border-[#1a1a1a]">
-                <SelectItem value="480" className="text-foreground hover:bg-[#141414]">480p (экономия трафика)</SelectItem>
-                <SelectItem value="720" className="text-foreground hover:bg-[#141414]">720p (рекомендуется)</SelectItem>
-                <SelectItem value="1080" className="text-foreground hover:bg-[#141414]">1080p (высокое качество)</SelectItem>
+              <SelectContent className="bg-card border-border">
+                <SelectItem value="480" className="text-foreground hover:bg-secondary">480p (экономия трафика)</SelectItem>
+                <SelectItem value="720" className="text-foreground hover:bg-secondary">720p (рекомендуется)</SelectItem>
+                <SelectItem value="1080" className="text-foreground hover:bg-secondary">1080p (высокое качество)</SelectItem>
               </SelectContent>
             </Select>
           </div>

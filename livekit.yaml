@@ -3,6 +3,7 @@ rtc:
   tcp_port: 7881
   port_range_start: 50000
   port_range_end: 50200
-  use_external_ip: true
+  use_external_ip: false
+  node_ip: 88.146.114.203
 keys:
   APIkeyChuba2026: secretChuba2026prodX9kLmNqW8vT3zPf

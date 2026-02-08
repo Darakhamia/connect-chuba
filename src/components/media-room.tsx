@@ -15,7 +15,7 @@ import {
   isTrackReference,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Track } from "livekit-client";
+import { Track, RoomOptions, ScreenSharePresets, VideoPresets } from "livekit-client";
 import { Loader2 } from "lucide-react";
 import { useVoice } from "@/hooks/use-voice-store";
 
@@ -100,7 +100,7 @@ function VoiceLayout({ video }: { video: boolean }) {
         </GridLayout>
       </div>
       <ControlBar
-        controls={{ chat: false, screenShare: video }}
+        controls={{ chat: false, screenShare: true }}
         variation="verbose"
       />
       <RoomAudioRenderer />
@@ -122,6 +122,16 @@ export function MediaRoom({
   const [serverUrl, setServerUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
   const { leaveVoice } = useVoice();
+
+  const roomOptions: RoomOptions = {
+    videoCaptureDefaults: {
+      resolution: VideoPresets.h720.resolution,
+    },
+    publishDefaults: {
+      screenShareEncoding: ScreenSharePresets.h1080fps30.encoding,
+      screenShareSimulcastLayers: [ScreenSharePresets.h720fps15],
+    },
+  };
 
   useEffect(() => {
     (async () => {
@@ -177,6 +187,7 @@ export function MediaRoom({
       connect={true}
       video={video}
       audio={audio}
+      options={roomOptions}
       onDisconnected={() => leaveVoice()}
       onError={(err) => {
         console.error("[LiveKit] Connection error:", err);

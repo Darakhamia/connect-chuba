@@ -15,7 +15,7 @@ import {
   isTrackReference,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Track } from "livekit-client";
+import { Track, RoomOptions, ScreenSharePresets, VideoPresets } from "livekit-client";
 import { Loader2 } from "lucide-react";
 
 interface DMCallProps {
@@ -96,7 +96,7 @@ function DMVoiceLayout({ isVideo }: { isVideo: boolean }) {
         </GridLayout>
       </div>
       <ControlBar
-        controls={{ chat: false, screenShare: isVideo }}
+        controls={{ chat: false, screenShare: true }}
         variation="verbose"
       />
       <RoomAudioRenderer />
@@ -114,6 +114,16 @@ export function DMCall({
   const [token, setToken] = useState("");
   const [serverUrl, setServerUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  const roomOptions: RoomOptions = {
+    videoCaptureDefaults: {
+      resolution: VideoPresets.h720.resolution,
+    },
+    publishDefaults: {
+      screenShareEncoding: ScreenSharePresets.h1080fps30.encoding,
+      screenShareSimulcastLayers: [ScreenSharePresets.h720fps15],
+    },
+  };
 
   useEffect(() => {
     (async () => {
@@ -165,6 +175,7 @@ export function DMCall({
         connect={true}
         video={isVideo}
         audio={true}
+        options={roomOptions}
         onDisconnected={onDisconnect}
         onError={(err) => {
           console.error("[LiveKit DM] Connection error:", err);

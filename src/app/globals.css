@@ -342,3 +342,10 @@
 .lk-control-bar .lk-button {
   border-radius: 8px !important;
 }
+
+/* Демонстрация экрана — показывать целиком без обрезки */
+.lk-participant-tile video[data-lk-source="screen_share"],
+.lk-participant-tile video[data-lk-source="screen_share_audio"] {
+  object-fit: contain !important;
+  background: #000;
+}

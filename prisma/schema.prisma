@@ -235,9 +235,14 @@ model Message {
   channelId String
   channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   
+  // Reply
+  replyToId String?
+  replyTo   Message?  @relation("ReplyTo", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies   Message[] @relation("ReplyTo")
+
   // Reactions
   reactions MessageReaction[]
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

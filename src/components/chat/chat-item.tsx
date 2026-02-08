@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Member, MemberRole } from "@prisma/client";
-import { Edit, FileIcon, ShieldAlert, ShieldCheck, Trash, Smile, Pin } from "lucide-react";
+import { Edit, FileIcon, ShieldAlert, ShieldCheck, Trash, Smile, Pin, Reply } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -22,6 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { UserProfileCard } from "@/components/user-profile-card";
 
 interface ChatItemProps {
   id: string;
@@ -34,6 +34,12 @@ interface ChatItemProps {
   isUpdated: boolean;
   socketUrl: string;
   socketQuery: Record<string, string>;
+  serverId?: string;
+  onReply?: (messageId: string, authorName: string, content: string) => void;
+  replyTo?: {
+    member: MemberWithProfile;
+    content: string;
+  } | null;
 }
 
 const roleIconMap = {
@@ -57,36 +63,31 @@ export function ChatItem({
   isUpdated,
   socketUrl,
   socketQuery,
+  serverId,
+  onReply,
+  replyTo,
 }: ChatItemProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [, setIsDeleting] = useState(false);
   const [showReactionPicker, setShowReactionPicker] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      content: content,
-    },
+    defaultValues: { content },
   });
 
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const url = qs.stringifyUrl({
-        url: `${socketUrl}/${id}`,
-        query: socketQuery,
-      });
-
+      const url = qs.stringifyUrl({ url: `${socketUrl}/${id}`, query: socketQuery });
       await fetch(url, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
-
       form.reset();
       setIsEditing(false);
     } catch (error) {
@@ -97,14 +98,8 @@ export function ChatItem({
   const onDelete = async () => {
     try {
       setIsDeleting(true);
-      const url = qs.stringifyUrl({
-        url: `${socketUrl}/${id}`,
-        query: socketQuery,
-      });
-
-      await fetch(url, {
-        method: "DELETE",
-      });
+      const url = qs.stringifyUrl({ url: `${socketUrl}/${id}`, query: socketQuery });
+      await fetch(url, { method: "DELETE" });
       router.refresh();
     } catch (error) {
       console.log(error);
@@ -115,19 +110,12 @@ export function ChatItem({
 
   const onReaction = async (emoji: string) => {
     try {
-      const url = qs.stringifyUrl({
-        url: `${socketUrl}/${id}/reactions`,
-        query: socketQuery,
-      });
-
+      const url = qs.stringifyUrl({ url: `${socketUrl}/${id}/reactions`, query: socketQuery });
       await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ emoji }),
       });
-      
       setShowReactionPicker(false);
       router.refresh();
     } catch (error) {
@@ -137,15 +125,8 @@ export function ChatItem({
 
   const onPin = async () => {
     try {
-      const url = qs.stringifyUrl({
-        url: `${socketUrl}/${id}/pin`,
-        query: socketQuery,
-      });
-
-      await fetch(url, {
-        method: "PATCH",
-      });
-      
+      const url = qs.stringifyUrl({ url: `${socketUrl}/${id}/pin`, query: socketQuery });
+      await fetch(url, { method: "PATCH" });
       router.refresh();
     } catch (error) {
       console.log(error);
@@ -165,20 +146,44 @@ export function ChatItem({
     <div className="relative group flex items-center hover:bg-black/5 p-4 transition w-full">
       <div className="group flex gap-x-2 items-start w-full">
         {/* Аватар */}
-        <Avatar className="h-8 w-8">
-          <AvatarImage src={member.profile.imageUrl} />
-          <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-            {member.profile.name.slice(0, 2).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+        <button onClick={() => setShowProfile(true)} className="shrink-0">
+          <Avatar className="h-8 w-8 cursor-pointer hover:opacity-80 transition">
+            <AvatarImage src={member.profile.imageUrl} />
+            <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+              {member.profile.name.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        </button>
 
         <div className="flex flex-col w-full">
+          {/* Reply preview */}
+          {replyTo && (
+            <div className="flex items-center gap-1.5 mb-1 text-xs text-muted-foreground">
+              <Reply className="w-3 h-3 rotate-180" />
+              <Avatar className="h-4 w-4">
+                <AvatarImage src={replyTo.member.profile.imageUrl} />
+                <AvatarFallback className="text-[8px]">
+                  {replyTo.member.profile.name.slice(0, 1)}
+                </AvatarFallback>
+              </Avatar>
+              <span className="font-semibold text-foreground/70">
+                {replyTo.member.profile.name}
+              </span>
+              <span className="truncate max-w-[300px]">
+                {replyTo.content}
+              </span>
+            </div>
+          )}
+
           {/* Имя и время */}
           <div className="flex items-center gap-x-2">
             <div className="flex items-center">
-              <p className="font-semibold text-sm hover:underline cursor-pointer">
+              <button
+                onClick={() => setShowProfile(true)}
+                className="font-semibold text-sm hover:underline cursor-pointer"
+              >
                 {member.profile.name}
-              </p>
+              </button>
               <TooltipProvider>
                 <Tooltip delayDuration={50}>
                   <TooltipTrigger>
@@ -201,7 +206,6 @@ export function ChatItem({
               rel="noopener noreferrer"
               className="relative rounded-md mt-2 overflow-hidden border flex items-center bg-secondary max-w-sm"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={fileUrl}
                 alt={content || "Изображение"}
@@ -214,12 +218,7 @@ export function ChatItem({
           {isPDF && (
             <div className="relative flex items-center p-2 mt-2 rounded-md bg-background/10">
               <FileIcon className="h-10 w-10 fill-indigo-200 stroke-indigo-400" />
-              <a
-                href={fileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ml-2 text-sm text-primary hover:underline"
-              >
+              <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-sm text-primary hover:underline">
                 PDF файл
               </a>
             </div>
@@ -227,17 +226,10 @@ export function ChatItem({
 
           {/* Контент сообщения */}
           {!fileUrl && !isEditing && (
-            <p
-              className={cn(
-                "text-sm text-foreground",
-                deleted && "italic text-muted-foreground text-xs mt-1"
-              )}
-            >
+            <p className={cn("text-sm text-foreground", deleted && "italic text-muted-foreground text-xs mt-1")}>
               {deleted ? "Сообщение удалено" : content}
               {isUpdated && !deleted && (
-                <span className="text-[10px] mx-2 text-muted-foreground">
-                  (изменено)
-                </span>
+                <span className="text-[10px] mx-2 text-muted-foreground">(изменено)</span>
               )}
             </p>
           )}
@@ -245,31 +237,24 @@ export function ChatItem({
           {/* Форма редактирования */}
           {!fileUrl && isEditing && (
             <Form {...form}>
-              <form
-                className="flex items-center w-full gap-x-2 pt-2"
-                onSubmit={form.handleSubmit(onSubmit)}
-              >
+              <form className="flex items-center w-full gap-x-2 pt-2" onSubmit={form.handleSubmit(onSubmit)}>
                 <FormField
                   control={form.control}
                   name="content"
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormControl>
-                        <div className="relative w-full">
-                          <Input
-                            disabled={isLoading}
-                            className="p-2 bg-input border-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground"
-                            placeholder="Изменённое сообщение"
-                            {...field}
-                          />
-                        </div>
+                        <Input
+                          disabled={isLoading}
+                          className="p-2 bg-input border-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground"
+                          placeholder="Изменённое сообщение"
+                          {...field}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
                 />
-                <Button disabled={isLoading} size="sm">
-                  Сохранить
-                </Button>
+                <Button disabled={isLoading} size="sm">Сохранить</Button>
               </form>
               <span className="text-[10px] mt-1 text-muted-foreground">
                 Нажмите Escape для отмены, Enter для сохранения
@@ -281,7 +266,22 @@ export function ChatItem({
 
       {/* Кнопки действий */}
       {!deleted && (
-        <div className="hidden group-hover:flex items-center gap-x-2 absolute p-1 -top-2 right-5 bg-white bg-card border rounded-sm">
+        <div className="hidden group-hover:flex items-center gap-x-2 absolute p-1 -top-2 right-5 bg-card border rounded-sm">
+          {/* Ответить */}
+          {onReply && (
+            <TooltipProvider>
+              <Tooltip delayDuration={50}>
+                <TooltipTrigger>
+                  <Reply
+                    onClick={() => onReply(id, member.profile.name, content)}
+                    className="cursor-pointer w-4 h-4 text-muted-foreground hover:text-foreground transition"
+                  />
+                </TooltipTrigger>
+                <TooltipContent><p>Ответить</p></TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+
           {/* Реакции */}
           <TooltipProvider>
             <Tooltip delayDuration={50}>
@@ -292,13 +292,9 @@ export function ChatItem({
                     className="cursor-pointer w-4 h-4 text-muted-foreground hover:text-foreground transition"
                   />
                   {showReactionPicker && (
-                    <div className="absolute top-6 right-0 bg-white bg-card border rounded-md p-2 flex gap-1 z-50">
+                    <div className="absolute top-6 right-0 bg-card border rounded-md p-2 flex gap-1 z-50">
                       {["👍", "❤️", "😂", "😮", "😢", "🔥", "✨", "🎉"].map((emoji) => (
-                        <button
-                          key={emoji}
-                          onClick={() => onReaction(emoji)}
-                          className="text-xl hover:scale-125 transition"
-                        >
+                        <button key={emoji} onClick={() => onReaction(emoji)} className="text-xl hover:scale-125 transition">
                           {emoji}
                         </button>
                       ))}
@@ -306,25 +302,18 @@ export function ChatItem({
                   )}
                 </div>
               </TooltipTrigger>
-              <TooltipContent>
-                <p>Реакция</p>
-              </TooltipContent>
+              <TooltipContent><p>Реакция</p></TooltipContent>
             </Tooltip>
           </TooltipProvider>
 
-          {/* Закрепить (только для модераторов/админов) */}
-          {(currentMember.role === MemberRole.ADMIN || currentMember.role === MemberRole.MODERATOR) && (
+          {/* Закрепить */}
+          {(isAdmin || isModerator) && (
             <TooltipProvider>
               <Tooltip delayDuration={50}>
                 <TooltipTrigger>
-                  <Pin
-                    onClick={onPin}
-                    className="cursor-pointer w-4 h-4 text-muted-foreground hover:text-foreground transition"
-                  />
+                  <Pin onClick={onPin} className="cursor-pointer w-4 h-4 text-muted-foreground hover:text-foreground transition" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  <p>Закрепить</p>
-                </TooltipContent>
+                <TooltipContent><p>Закрепить</p></TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}
@@ -334,14 +323,9 @@ export function ChatItem({
             <TooltipProvider>
               <Tooltip delayDuration={50}>
                 <TooltipTrigger>
-                  <Edit
-                    onClick={() => setIsEditing(true)}
-                    className="cursor-pointer ml-auto w-4 h-4 text-muted-foreground hover:text-foreground transition"
-                  />
+                  <Edit onClick={() => setIsEditing(true)} className="cursor-pointer w-4 h-4 text-muted-foreground hover:text-foreground transition" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  <p>Редактировать</p>
-                </TooltipContent>
+                <TooltipContent><p>Редактировать</p></TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}
@@ -351,20 +335,32 @@ export function ChatItem({
             <TooltipProvider>
               <Tooltip delayDuration={50}>
                 <TooltipTrigger>
-                  <Trash
-                    onClick={onDelete}
-                    className="cursor-pointer ml-auto w-4 h-4 text-muted-foreground hover:text-rose-500 transition"
-                  />
+                  <Trash onClick={onDelete} className="cursor-pointer w-4 h-4 text-muted-foreground hover:text-rose-500 transition" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  <p>Удалить</p>
-                </TooltipContent>
+                <TooltipContent><p>Удалить</p></TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}
         </div>
       )}
+
+      {/* Profile card */}
+      {showProfile && serverId && (
+        <UserProfileCard
+          member={{
+            id: member.id,
+            role: member.role,
+            profile: {
+              id: member.profile.id,
+              name: member.profile.name,
+              imageUrl: member.profile.imageUrl,
+              email: member.profile.email,
+            },
+          }}
+          serverId={serverId}
+          onClose={() => setShowProfile(false)}
+        />
+      )}
     </div>
   );
 }
-

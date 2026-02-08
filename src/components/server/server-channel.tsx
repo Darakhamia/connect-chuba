@@ -5,6 +5,7 @@ import { Hash, Mic, Video, Edit, Trash, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Channel, ChannelType, MemberRole, Server } from "@prisma/client";
 import { useModal } from "@/hooks/use-modal-store";
+import { useUnread } from "@/hooks/use-unread-store";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ServerChannelProps {
@@ -24,9 +25,12 @@ export function ServerChannel({ channel, server, role }: ServerChannelProps) {
   const params = useParams();
   const router = useRouter();
 
+  const { isUnread, markRead } = useUnread();
   const Icon = iconMap[channel.type];
+  const hasUnread = isUnread(channel.id);
 
   const onClick = () => {
+    markRead(channel.id);
     router.push(`/servers/${server.id}/channels/${channel.id}`);
   };
 
@@ -44,15 +48,21 @@ export function ServerChannel({ channel, server, role }: ServerChannelProps) {
       )}
     >
       <Icon className="flex-shrink-0 w-5 h-5 text-muted-foreground" />
-      
+
       <p
         className={cn(
           "line-clamp-1 font-semibold text-sm text-muted-foreground group-hover:text-foreground transition",
-          params?.channelId === channel.id && "text-foreground"
+          params?.channelId === channel.id && "text-foreground",
+          hasUnread && params?.channelId !== channel.id && "text-foreground"
         )}
       >
         {channel.name}
       </p>
+
+      {/* Unread indicator */}
+      {hasUnread && params?.channelId !== channel.id && (
+        <div className="ml-auto w-2 h-2 rounded-full bg-primary shrink-0" />
+      )}
       
       {/* Действия (только для не-general каналов) */}
       {channel.name !== "general" && role !== MemberRole.GUEST && (

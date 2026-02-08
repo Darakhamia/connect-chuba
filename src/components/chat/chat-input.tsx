@@ -6,25 +6,33 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import qs from "query-string";
-import { Plus, SendHorizontal } from "lucide-react";
+import { Plus, SendHorizontal, X, Reply } from "lucide-react";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useModal } from "@/hooks/use-modal-store";
 import { EmojiPicker } from "@/components/emoji-picker";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
+interface ReplyInfo {
+  messageId: string;
+  authorName: string;
+  content: string;
+}
+
 interface ChatInputProps {
   apiUrl: string;
   query: Record<string, string>;
   name: string;
   type: "channel" | "conversation";
+  replyTo?: ReplyInfo | null;
+  onCancelReply?: () => void;
 }
 
 const formSchema = z.object({
   content: z.string().min(1),
 });
 
-export function ChatInput({ apiUrl, query, name, type }: ChatInputProps) {
+export function ChatInput({ apiUrl, query, name, type, replyTo, onCancelReply }: ChatInputProps) {
   const { onOpen } = useModal();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +47,7 @@ export function ChatInput({ apiUrl, query, name, type }: ChatInputProps) {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setIsLoading(true);
-      
+
       const url = qs.stringifyUrl({
         url: apiUrl,
         query,
@@ -47,13 +55,15 @@ export function ChatInput({ apiUrl, query, name, type }: ChatInputProps) {
 
       await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...values,
+          replyToId: replyTo?.messageId || undefined,
+        }),
       });
-      
+
       form.reset();
+      onCancelReply?.();
       router.refresh();
     } catch (error) {
       console.error(error);
@@ -72,7 +82,24 @@ export function ChatInput({ apiUrl, query, name, type }: ChatInputProps) {
             <FormItem>
               <FormControl>
                 <div className="relative p-4 pb-6">
-                  <div className="flex items-center gap-2 px-4 py-2 bg-chat-input rounded-lg">
+                  {/* Reply preview */}
+                  {replyTo && (
+                    <div className="flex items-center gap-2 px-4 py-2 mb-1 bg-muted/50 rounded-t-lg border-l-2 border-primary">
+                      <Reply className="w-4 h-4 text-primary rotate-180 shrink-0" />
+                      <span className="text-xs text-muted-foreground truncate">
+                        Ответ <span className="font-semibold text-foreground">{replyTo.authorName}</span>: {replyTo.content}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={onCancelReply}
+                        className="ml-auto shrink-0 p-0.5 rounded hover:bg-muted transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5 text-muted-foreground" />
+                      </button>
+                    </div>
+                  )}
+
+                  <div className={`flex items-center gap-2 px-4 py-2 bg-chat-input ${replyTo ? "rounded-b-lg" : "rounded-lg"}`}>
                     {/* Кнопка прикрепления файла */}
                     <TooltipProvider delayDuration={50}>
                       <Tooltip>
@@ -104,7 +131,7 @@ export function ChatInput({ apiUrl, query, name, type }: ChatInputProps) {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <div>
-                            <EmojiPicker 
+                            <EmojiPicker
                               onChange={(emoji: string) => {
                                 field.onChange(`${field.value}${emoji}`);
                               }}

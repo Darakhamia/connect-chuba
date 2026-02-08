@@ -28,6 +28,9 @@ export type MessageWithMemberWithProfile = Message & {
   reactions: (MessageReaction & {
     member: MemberWithProfile;
   })[];
+  replyTo?: (Message & {
+    member: MemberWithProfile;
+  }) | null;
 };
 
 // DM Message с Profile и Reactions

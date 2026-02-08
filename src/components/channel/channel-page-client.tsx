@@ -7,6 +7,7 @@ import { ChatMessages } from "@/components/chat/chat-messages";
 import { ChatInput } from "@/components/chat/chat-input";
 import { MediaRoom } from "@/components/media-room";
 import { MusicPanel } from "@/components/music/music-panel";
+import { MemberPanel } from "@/components/member-panel";
 import { useVoice } from "@/hooks/use-voice-store";
 import { Headphones, Video, LogIn } from "lucide-react";
 
@@ -16,6 +17,12 @@ interface VoiceParticipant {
   identity: string;
   name: string;
   avatarUrl: string;
+}
+
+interface ReplyInfo {
+  messageId: string;
+  authorName: string;
+  content: string;
 }
 
 interface ChannelPageClientProps {
@@ -117,6 +124,8 @@ function VoiceLobby({
 
 export function ChannelPageClient({ channel, member, server, serverId }: ChannelPageClientProps) {
   const [showMusicPanel, setShowMusicPanel] = useState(false);
+  const [showMembers, setShowMembers] = useState(false);
+  const [replyTo, setReplyTo] = useState<ReplyInfo | null>(null);
   const { activeChannelId, joinVoice } = useVoice();
   const isVoiceChannel = channel.type === ChannelType.AUDIO || channel.type === ChannelType.VIDEO;
   const isJoined = activeChannelId === channel.id;
@@ -131,15 +140,21 @@ export function ChannelPageClient({ channel, member, server, serverId }: Channel
     });
   };
 
+  const handleReply = (messageId: string, authorName: string, content: string) => {
+    setReplyTo({ messageId, authorName, content });
+  };
+
   return (
     <div className="bg-chat-area flex h-full">
-      <div className="flex flex-col flex-1 h-full">
+      <div className="flex flex-col flex-1 h-full min-w-0">
         <ChatHeader
           name={channel.name}
           serverId={serverId}
           channelId={channel.id}
           type="channel"
           onMusicClick={isVoiceChannel && isJoined ? () => setShowMusicPanel(!showMusicPanel) : undefined}
+          onMembersClick={() => setShowMembers(!showMembers)}
+          showMembers={showMembers}
         />
 
         {/* Text channel */}
@@ -158,6 +173,8 @@ export function ChannelPageClient({ channel, member, server, serverId }: Channel
               paramKey="channelId"
               paramValue={channel.id}
               chatId={channel.id}
+              serverId={serverId}
+              onReply={handleReply}
             />
             <ChatInput
               name={channel.name}
@@ -167,6 +184,8 @@ export function ChannelPageClient({ channel, member, server, serverId }: Channel
                 channelId: channel.id,
                 serverId,
               }}
+              replyTo={replyTo}
+              onCancelReply={() => setReplyTo(null)}
             />
           </>
         )}
@@ -195,6 +214,14 @@ export function ChannelPageClient({ channel, member, server, serverId }: Channel
           />
         )}
       </div>
+
+      {/* Member Panel */}
+      {showMembers && (
+        <MemberPanel
+          serverId={serverId}
+          onClose={() => setShowMembers(false)}
+        />
+      )}
 
       {/* Music Panel */}
       {showMusicPanel && isVoiceChannel && isJoined && (

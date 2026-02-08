@@ -23,6 +23,8 @@ interface ChatMessagesProps {
   paramKey: "channelId" | "conversationId";
   paramValue: string;
   type: "channel" | "conversation";
+  serverId?: string;
+  onReply?: (messageId: string, authorName: string, content: string) => void;
 }
 
 export function ChatMessages({
@@ -35,6 +37,8 @@ export function ChatMessages({
   paramKey,
   paramValue,
   type,
+  serverId,
+  onReply,
 }: ChatMessagesProps) {
   const queryKey = `chat:${chatId}`;
   const addKey = `chat:${chatId}:messages`;
@@ -80,19 +84,16 @@ export function ChatMessages({
 
   return (
     <div ref={chatRef} className="flex-1 flex flex-col py-4 overflow-y-auto">
-      {/* Показываем приветствие если нет сообщений или достигли конца */}
       {!hasNextPage && <div className="flex-1" />}
-      
+
       {!hasNextPage && (
         <div className="space-y-2 px-4 mb-4">
           <div className="h-[75px] w-[75px] rounded-full bg-muted flex items-center justify-center">
             <Hash className="h-12 w-12 text-muted-foreground" />
           </div>
-          
           <p className="text-xl md:text-3xl font-bold">
             {type === "channel" ? `Добро пожаловать в #${name}!` : name}
           </p>
-          
           <p className="text-muted-foreground text-sm">
             {type === "channel"
               ? `Это начало канала #${name}.`
@@ -101,7 +102,6 @@ export function ChatMessages({
         </div>
       )}
 
-      {/* Кнопка загрузки ещё */}
       {hasNextPage && (
         <div className="flex justify-center">
           {isFetchingNextPage ? (
@@ -117,7 +117,6 @@ export function ChatMessages({
         </div>
       )}
 
-      {/* Сообщения */}
       <div className="flex flex-col-reverse mt-auto">
         {data?.pages?.map((group, i) => (
           <Fragment key={i}>
@@ -134,6 +133,9 @@ export function ChatMessages({
                 isUpdated={message.updatedAt !== message.createdAt}
                 socketUrl={socketUrl}
                 socketQuery={socketQuery}
+                serverId={serverId}
+                onReply={onReply}
+                replyTo={message.replyTo}
               />
             ))}
           </Fragment>

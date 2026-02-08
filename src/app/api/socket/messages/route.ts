@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 export async function POST(req: Request) {
   try {
     const profile = await currentProfile();
-    const { content, fileUrl } = await req.json();
+    const { content, fileUrl, replyToId } = await req.json();
     const { searchParams } = new URL(req.url);
     
     const serverId = searchParams.get("serverId");
@@ -74,6 +74,7 @@ export async function POST(req: Request) {
         fileUrl,
         channelId: channelId,
         memberId: member.id,
+        ...(replyToId ? { replyToId } : {}),
       },
       include: {
         member: {

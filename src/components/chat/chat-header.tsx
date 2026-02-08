@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Hash, Search, Pin, Music2 } from "lucide-react";
+import { Hash, Search, Pin, Music2, Users } from "lucide-react";
 import { MobileToggle } from "@/components/mobile-toggle";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,9 +21,11 @@ interface ChatHeaderProps {
   type: "channel" | "conversation";
   imageUrl?: string;
   onMusicClick?: () => void;
+  onMembersClick?: () => void;
+  showMembers?: boolean;
 }
 
-export function ChatHeader({ serverId, channelId, conversationId, name, type, imageUrl, onMusicClick }: ChatHeaderProps) {
+export function ChatHeader({ serverId, channelId, conversationId, name, type, imageUrl, onMusicClick, onMembersClick, showMembers }: ChatHeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -106,6 +108,20 @@ export function ChatHeader({ serverId, channelId, conversationId, name, type, im
             title="Закрепленные"
           >
             <Pin className="h-4 w-4" />
+          </Button>
+        )}
+
+        {/* Поиск */}
+        {/* Участники */}
+        {type === "channel" && onMembersClick && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onMembersClick}
+            className={`h-8 w-8 ${showMembers ? "text-foreground bg-muted" : ""}`}
+            title="Участники"
+          >
+            <Users className="h-4 w-4" />
           </Button>
         )}
 

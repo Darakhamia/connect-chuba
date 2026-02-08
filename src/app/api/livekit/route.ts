@@ -32,7 +32,8 @@ export async function GET(req: Request) {
 
     const at = new AccessToken(apiKey, apiSecret, {
       identity: username,
-      ttl: "10m", // Токен действителен 10 минут
+      metadata: JSON.stringify({ avatarUrl: profile.imageUrl }),
+      ttl: "10m",
     });
 
     at.addGrant({

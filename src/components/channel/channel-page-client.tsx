@@ -71,6 +71,7 @@ export function ChannelPageClient({ channel, member, server, serverId }: Channel
             serverId={serverId}
             serverName={server.name}
             username={member.profile.name}
+            imageUrl={member.profile.imageUrl}
           />
         )}
       </div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Hash, Search, Pin, Music2 } from "lucide-react";
 import { MobileToggle } from "@/components/mobile-toggle";
-import { SocketIndicator } from "@/components/socket-indicator";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -147,7 +147,6 @@ export function ChatHeader({ serverId, channelId, conversationId, name, type, im
           </PopoverContent>
         </Popover>
 
-        <SocketIndicator />
       </div>
     </div>
   );

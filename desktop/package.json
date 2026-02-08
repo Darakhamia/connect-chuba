@@ -1,0 +1,50 @@
+{
+  "name": "connect-chuba",
+  "version": "1.0.0",
+  "description": "Connect Chuba - Desktop App",
+  "main": "main.js",
+  "author": "Connect Chuba Team",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win --x64",
+    "build:all": "electron-builder --win --mac --linux"
+  },
+  "build": {
+    "appId": "net.airecho.connect-chuba",
+    "productName": "Connect Chuba",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "icons/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "icons/icon.ico",
+      "uninstallerIcon": "icons/icon.ico",
+      "installerHeaderIcon": "icons/icon.ico",
+      "shortcutName": "Connect Chuba"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "icons/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "icons"
+    }
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  }
+}

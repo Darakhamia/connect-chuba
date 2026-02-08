@@ -48,6 +48,9 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
 
+# Создаём директорию для загрузок с правами nextjs
+RUN mkdir -p ./public/uploads && chown -R nextjs:nodejs ./public/uploads
+
 # Автоматически используем standalone output если включён
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static

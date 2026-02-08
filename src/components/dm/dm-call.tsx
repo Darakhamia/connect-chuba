@@ -17,7 +17,6 @@ import {
 import "@livekit/components-styles";
 import { Track } from "livekit-client";
 import { Loader2 } from "lucide-react";
-import Image from "next/image";
 
 interface DMCallProps {
   conversationId: string;
@@ -35,20 +34,19 @@ function ParticipantAvatar() {
     avatarUrl = meta.avatarUrl || "";
   } catch {}
 
+  const initial = participant.identity?.charAt(0)?.toUpperCase() || "?";
+
   return (
-    <div className="lk-participant-placeholder">
+    <div className="absolute inset-0 flex items-center justify-center">
       {avatarUrl ? (
-        <Image
+        <img
           src={avatarUrl}
           alt={participant.identity}
-          width={96}
-          height={96}
-          className="rounded-full object-cover"
-          unoptimized
+          className="w-24 h-24 rounded-full object-cover"
         />
       ) : (
-        <div className="w-24 h-24 rounded-full bg-[rgba(255,255,255,0.1)] flex items-center justify-center text-3xl font-bold text-white/70">
-          {participant.identity?.charAt(0)?.toUpperCase() || "?"}
+        <div className="w-24 h-24 rounded-full bg-white/10 flex items-center justify-center text-3xl font-bold text-white/70">
+          {initial}
         </div>
       )}
     </div>

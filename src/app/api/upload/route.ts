@@ -50,8 +50,8 @@ export async function POST(req: Request) {
     // Save file
     await writeFile(filepath, buffer);
 
-    // Return URL
-    const url = `/uploads/${filename}`;
+    // Return URL (через API route, т.к. standalone не раздаёт public/)
+    const url = `/api/uploads/${filename}`;
 
     return NextResponse.json({ url });
   } catch (error) {

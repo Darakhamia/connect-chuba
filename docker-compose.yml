@@ -59,6 +59,9 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    volumes:
+      # Загруженные аватарки сохраняются между рестартами
+      - uploads_data:/app/public/uploads
     environment:
       - DATABASE_URL=postgresql://chuba_user:Ch8b4_Pr0d_2026!@db:5432/connect_chuba
       - HOSTNAME=0.0.0.0
@@ -72,6 +75,7 @@ services:
 
 volumes:
   postgres_data:
+  uploads_data:
 
 networks:
   internal:

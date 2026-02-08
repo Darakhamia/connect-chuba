@@ -315,16 +315,7 @@
   position: relative;
 }
 
-/* Плейсхолдер (камера выключена) — центрирование аватарки */
-.lk-participant-placeholder {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  height: 100%;
-  width: 100%;
-}
-
-/* Скрыть дефолтную SVG-иконку силуэта */
+/* Скрыть дефолтную SVG-иконку силуэта (кастомная аватарка вместо неё) */
 .lk-participant-placeholder > svg {
   display: none;
 }

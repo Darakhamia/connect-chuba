@@ -18,6 +18,16 @@ const nextConfig: NextConfig = {
     },
   },
 
+  // Старые URL /uploads/* → /api/uploads/* (standalone не раздаёт public/)
+  async rewrites() {
+    return [
+      {
+        source: "/uploads/:path*",
+        destination: "/api/uploads/:path*",
+      },
+    ];
+  },
+
   images: {
     remotePatterns: [
       {

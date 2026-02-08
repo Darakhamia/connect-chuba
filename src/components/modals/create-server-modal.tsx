@@ -100,9 +100,9 @@ export function CreateServerModal() {
       form.reset();
       setStep("template");
       setSelectedTemplate(null);
-      router.refresh();
       onClose();
-      router.push(`/servers/${server.id}`);
+      // Full page reload to guarantee server-component sidebar re-renders
+      window.location.href = `/servers/${server.id}`;
     } catch (error) {
       console.error("Error creating server:", error);
     } finally {

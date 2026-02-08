@@ -21,7 +21,7 @@ services:
   # LiveKit - Voice/Video сервер
   # WebRTC требует прямого UDP, Cloudflare Tunnel его не поддерживает.
   # Используем отдельный поддомен lk.airecho.net (DNS-only, без прокси CF).
-  # Caddy перед LiveKit обеспечивает TLS для WebSocket-сигналинга.
+  # Traefik (уже запущен на сервере) обеспечивает TLS для WSS сигналинга.
   livekit:
     image: livekit/livekit-server:latest
     container_name: connect-chuba-livekit
@@ -34,26 +34,15 @@ services:
       - "50000-50200:50000-50200/udp"
       # ICE/TURN TCP fallback
       - "7881:7881/tcp"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.livekit.rule=Host(`lk.airecho.net`)"
+      - "traefik.http.routers.livekit.entrypoints=websecure"
+      - "traefik.http.routers.livekit.tls.certresolver=letsencrypt"
+      - "traefik.http.services.livekit.loadbalancer.server.port=7880"
     networks:
       - internal
-
-  # Caddy - TLS reverse proxy для LiveKit сигналинга (WSS)
-  # Автоматически получает Let's Encrypt сертификат для lk.airecho.net
-  caddy:
-    image: caddy:2-alpine
-    container_name: connect-chuba-caddy
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      - livekit
-    networks:
-      - internal
+      - traefik-public
 
   # Приложение Connect Chuba
   app:
@@ -83,9 +72,9 @@ services:
 
 volumes:
   postgres_data:
-  caddy_data:
-  caddy_config:
 
 networks:
   internal:
     driver: bridge
+  traefik-public:
+    external: true

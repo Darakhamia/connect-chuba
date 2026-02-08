@@ -121,19 +121,7 @@ export function MediaRoom({
   const [token, setToken] = useState("");
   const [serverUrl, setServerUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const { joinVoice, leaveVoice, activeChannelId } = useVoice();
-
-  useEffect(() => {
-    if (activeChannelId !== chatId) {
-      joinVoice({
-        channelId: chatId,
-        channelName,
-        serverId,
-        serverName,
-        isVideo: video,
-      });
-    }
-  }, [chatId, channelName, serverId, serverName, video, joinVoice, activeChannelId]);
+  const { leaveVoice } = useVoice();
 
   useEffect(() => {
     (async () => {

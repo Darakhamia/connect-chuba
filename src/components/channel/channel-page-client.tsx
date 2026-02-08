@@ -7,6 +7,7 @@ import { ChatMessages } from "@/components/chat/chat-messages";
 import { ChatInput } from "@/components/chat/chat-input";
 import { MediaRoom } from "@/components/media-room";
 import { MusicPanel } from "@/components/music/music-panel";
+import { useVoice } from "@/hooks/use-voice-store";
 import { Headphones, Video, LogIn } from "lucide-react";
 
 type MemberWithProfile = Member & { profile: Profile };
@@ -116,8 +117,19 @@ function VoiceLobby({
 
 export function ChannelPageClient({ channel, member, server, serverId }: ChannelPageClientProps) {
   const [showMusicPanel, setShowMusicPanel] = useState(false);
-  const [joined, setJoined] = useState(false);
+  const { activeChannelId, joinVoice } = useVoice();
   const isVoiceChannel = channel.type === ChannelType.AUDIO || channel.type === ChannelType.VIDEO;
+  const isJoined = activeChannelId === channel.id;
+
+  const handleJoin = () => {
+    joinVoice({
+      channelId: channel.id,
+      channelName: channel.name,
+      serverId,
+      serverName: server.name,
+      isVideo: channel.type === ChannelType.VIDEO,
+    });
+  };
 
   return (
     <div className="bg-chat-area flex h-full">
@@ -127,7 +139,7 @@ export function ChannelPageClient({ channel, member, server, serverId }: Channel
           serverId={serverId}
           channelId={channel.id}
           type="channel"
-          onMusicClick={isVoiceChannel && joined ? () => setShowMusicPanel(!showMusicPanel) : undefined}
+          onMusicClick={isVoiceChannel && isJoined ? () => setShowMusicPanel(!showMusicPanel) : undefined}
         />
 
         {/* Text channel */}
@@ -160,17 +172,17 @@ export function ChannelPageClient({ channel, member, server, serverId }: Channel
         )}
 
         {/* Voice/Video channel — Lobby */}
-        {isVoiceChannel && !joined && (
+        {isVoiceChannel && !isJoined && (
           <VoiceLobby
             channelName={channel.name}
             channelId={channel.id}
             isVideo={channel.type === ChannelType.VIDEO}
-            onJoin={() => setJoined(true)}
+            onJoin={handleJoin}
           />
         )}
 
         {/* Voice/Video channel — Connected */}
-        {isVoiceChannel && joined && (
+        {isVoiceChannel && isJoined && (
           <MediaRoom
             chatId={channel.id}
             video={channel.type === ChannelType.VIDEO}
@@ -185,7 +197,7 @@ export function ChannelPageClient({ channel, member, server, serverId }: Channel
       </div>
 
       {/* Music Panel */}
-      {showMusicPanel && isVoiceChannel && joined && (
+      {showMusicPanel && isVoiceChannel && isJoined && (
         <MusicPanel
           serverId={serverId}
           voiceChannelId={channel.id}

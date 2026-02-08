@@ -1,0 +1,7 @@
+# Caddy reverse proxy для LiveKit WebSocket сигналинга
+# Автоматически получает Let's Encrypt TLS сертификат
+# DNS запись lk.airecho.net должна быть DNS-only (серая иконка в Cloudflare)
+
+lk.airecho.net {
+    reverse_proxy livekit:7880
+}

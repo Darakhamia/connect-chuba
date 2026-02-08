@@ -19,6 +19,9 @@ services:
       - internal
 
   # LiveKit - Voice/Video сервер
+  # WebRTC требует прямого UDP, Cloudflare Tunnel его не поддерживает.
+  # Используем отдельный поддомен lk.airecho.net (DNS-only, без прокси CF).
+  # Caddy перед LiveKit обеспечивает TLS для WebSocket-сигналинга.
   livekit:
     image: livekit/livekit-server:latest
     container_name: connect-chuba-livekit
@@ -27,12 +30,28 @@ services:
     volumes:
       - ./livekit.yaml:/etc/livekit.yaml:ro
     ports:
-      # LiveKit HTTP/WebSocket (для Cloudflare Tunnel)
-      - "7880:7880/tcp"
-      # WebRTC UDP media
+      # WebRTC UDP media (прямой доступ, без прокси)
       - "50000-50200:50000-50200/udp"
-      # TURN TCP fallback
+      # ICE/TURN TCP fallback
       - "7881:7881/tcp"
+    networks:
+      - internal
+
+  # Caddy - TLS reverse proxy для LiveKit сигналинга (WSS)
+  # Автоматически получает Let's Encrypt сертификат для lk.airecho.net
+  caddy:
+    image: caddy:2-alpine
+    container_name: connect-chuba-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - livekit
     networks:
       - internal
 
@@ -64,6 +83,8 @@ services:
 
 volumes:
   postgres_data:
+  caddy_data:
+  caddy_config:
 
 networks:
   internal:

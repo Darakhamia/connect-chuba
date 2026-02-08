@@ -48,12 +48,20 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
 
+# Prisma CLI для db push при старте (standalone не включает devDependencies)
+COPY --from=deps /app/node_modules/prisma ./node_modules/prisma
+COPY --from=deps /app/node_modules/@prisma ./node_modules/@prisma
+
 # Создаём директорию для загрузок с правами nextjs
 RUN mkdir -p ./public/uploads && chown -R nextjs:nodejs ./public/uploads
 
 # Автоматически используем standalone output если включён
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Startup script (prisma db push + node server.js)
+COPY --chown=nextjs:nodejs start.sh ./start.sh
+RUN chmod +x ./start.sh
 
 USER nextjs
 
@@ -62,4 +70,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["./start.sh"]

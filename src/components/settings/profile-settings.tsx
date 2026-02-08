@@ -30,6 +30,12 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
   const [copied, setCopied] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
+  const [dialogAvatarValue, setDialogAvatarValue] = useState("");
+
+  const openAvatarDialog = () => {
+    setDialogAvatarValue("");
+    setIsAvatarDialogOpen(true);
+  };
 
   const handleCopyId = () => {
     navigator.clipboard.writeText(profile.id);
@@ -57,6 +63,7 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
   };
 
   const handleAvatarChange = (url?: string) => {
+    setDialogAvatarValue(url || "");
     if (url) {
       setImageUrl(url);
       checkChanges(name, bio, url);
@@ -114,7 +121,7 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
             </AvatarFallback>
           </Avatar>
           <button 
-            onClick={() => setIsAvatarDialogOpen(true)}
+            onClick={openAvatarDialog}
             className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
           >
             <Camera className="w-6 h-6 text-foreground" />
@@ -128,7 +135,7 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
             variant="outline" 
             size="sm" 
             className="border-border"
-            onClick={() => setIsAvatarDialogOpen(true)}
+            onClick={openAvatarDialog}
           >
             Изменить аватар
           </Button>
@@ -145,7 +152,7 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
             <div className="flex justify-center">
               <FileUpload
                 endpoint="serverImage"
-                value={imageUrl}
+                value={dialogAvatarValue}
                 onChange={handleAvatarChange}
               />
             </div>
